@@ -15,6 +15,7 @@ mongoose.connect("mongodb+srv://Yair:Yair2004@cluster0.fg959i9.mongodb.net/")
 .then(() => console.log("Connected to MongoDB"))
 .catch(err => console.log(err));
 
+
 // ============================
 // Middleware
 // ============================
@@ -30,168 +31,251 @@ app.use(session({
 
 app.use(express.static(path.join(__dirname, "public")));
 
+
 // ============================
 // User Schema
 // ============================
 
 const userSchema = new mongoose.Schema({
 
-    username: {
-        type: String,
-        required: true,
-        unique: true
+    username:{
+        type:String,
+        required:true,
+        unique:true
     },
 
-    password: {
-        type: String,
-        required: true
+    password:{
+        type:String,
+        required:true
     }
 
 });
 
+
 const User = mongoose.model("User", userSchema);
+
 
 // ============================
 // Home Page
 // ============================
 
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "verification.html"));
+app.get("/", (req,res)=>{
+
+    res.sendFile(
+        path.join(__dirname,"public","verification.html")
+    );
+
 });
+
 
 // ============================
 // Choice Page
 // ============================
 
-app.get("/choice", (req, res) => {
+app.get("/choice",(req,res)=>{
 
-    if (!req.session.user) {
+    if(!req.session.user){
         return res.redirect("/");
     }
 
-    res.sendFile(path.join(__dirname, "public", "choice.html"));
+    res.sendFile(
+        path.join(__dirname,"public","choice.html")
+    );
 
 });
+
 
 // ============================
 // Current User
 // ============================
 
-app.get("/user", (req, res) => {
+app.get("/user",(req,res)=>{
 
-    if (!req.session.user) {
-        return res.json({ username: "" });
+    if(!req.session.user){
+        return res.json({username:""});
     }
 
-    res.json({ username: req.session.user });
+    res.json({
+        username:req.session.user
+    });
 
 });
+
 
 // ============================
 // Register
 // ============================
 
-app.post("/register", async (req, res) => {
+app.post("/register", async(req,res)=>{
 
-    try {
+    try{
 
-        const { username, password } = req.body;
+        const {username,password}=req.body;
 
-        const existingUser = await User.findOne({ username });
 
-        if (existingUser) {
-            return res.send("Username already exists.");
+        const existingUser = await User.findOne({username});
+
+
+        if(existingUser){
+
+            return res.redirect(
+                "/?error=Username%20already%20exists"
+            );
+
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const hashedPassword =
+            await bcrypt.hash(password,10);
+
+
 
         const newUser = new User({
+
             username,
-            password: hashedPassword
+            password:hashedPassword
+
         });
+
+
 
         await newUser.save();
 
+
+
         req.session.user = newUser.username;
+
 
         res.redirect("/choice");
 
-    } catch (err) {
+
+    }catch(err){
 
         console.log(err);
-        res.status(500).send("Server Error");
+
+        res.redirect(
+            "/?error=Server%20error"
+        );
 
     }
 
 });
+
 
 // ============================
 // Login
 // ============================
 
-app.post("/login", async (req, res) => {
+app.post("/login", async(req,res)=>{
 
-    try {
+    try{
 
-        const { username, password } = req.body;
 
-        const user = await User.findOne({ username });
+        const {username,password}=req.body;
 
-        if (!user) {
-            return res.send("User not found.");
+
+        const user = await User.findOne({username});
+
+
+
+        if(!user){
+
+            return res.redirect(
+                "/?error=User%20not%20found"
+            );
+
         }
 
-        const validPassword = await bcrypt.compare(password, user.password);
 
-        if (!validPassword) {
-            return res.send("Incorrect password.");
+
+        const validPassword =
+            await bcrypt.compare(password,user.password);
+
+
+
+        if(!validPassword){
+
+            return res.redirect(
+                "/?error=Incorrect%20password"
+            );
+
         }
 
-        req.session.user = user.username;
+
+
+        req.session.user=user.username;
+
 
         res.redirect("/choice");
 
-    } catch (err) {
+
+
+    }catch(err){
+
 
         console.log(err);
-        res.status(500).send("Server Error");
+
+
+        res.redirect(
+            "/?error=Server%20error"
+        );
+
 
     }
 
+
 });
+
 
 // ============================
 // Dashboard
 // ============================
 
-app.get("/dashboard", (req, res) => {
+app.get("/dashboard",(req,res)=>{
 
-    if (!req.session.user) {
-        return res.send("Please log in first.");
+
+    if(!req.session.user){
+
+        return res.send(
+            "Please log in first."
+        );
+
     }
 
-    res.send(`Welcome ${req.session.user}!`);
+
+    res.send(
+        `Welcome ${req.session.user}!`
+    );
+
 
 });
+
 
 // ============================
 // Logout
 // ============================
 
-app.get("/logout", (req, res) => {
+app.get("/logout",(req,res)=>{
 
-    req.session.destroy(() => {
+
+    req.session.destroy(()=>{
+
         res.redirect("/");
+
     });
 
+
 });
+
 
 // ============================
 // Start Server
 // ============================
 
-app.listen(PORT, "0.0.0.0", () => {
-    console.log("Server running on port http://10.70.248.190:3000");
-});
+app.listen(PORT,"0.0.0.0",()=>{
 
-// testing phone connection
+    console.log(
+        "Server running on http://10.70.248.190:3000"
+    );
+
+});
