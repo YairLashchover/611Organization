@@ -191,7 +191,7 @@ app.get("/logout", (req, res) => {
 // ============================
 
 app.listen(PORT, "0.0.0.0", () => {
-    console.log("Server running on port 10.70.248.190:3000");
+    console.log("Server running on port http://10.70.248.190:3000");
 });
 
 // testing phone connection
