@@ -21,7 +21,7 @@
             fetch("/user")
             .then(response => response.json())
             .then(data => {
-                document.getElementById("username").textContent = "Hello " + data.username;
+                document.getElementById("username").textContent = "שלום " + data.username;
             });
             </script>
         </div>
@@ -34,22 +34,18 @@
         <div class="choice-card">
 
             <h1>
-                Choice Screen
+                :בחר סביבת עבודה
             </h1>
-
-            <p>
-                Welcome! Please choose an option to continue.
-            </p>
 
 
             <div class="buttons">
 
                 <button class="choice-btn">
-                    Option 1
+                    לו"ז
                 </button>
 
                 <button class="choice-btn">
-                    Option 2
+                    ציוד
                 </button>
 
             </div>
