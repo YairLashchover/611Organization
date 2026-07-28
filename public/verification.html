@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification</title>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+        body{
+            background:#f4f4f4;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+        }
+
+        .container{
+            width:380px;
+            background:white;
+            padding:30px;
+            border-radius:10px;
+            box-shadow:0 0 15px rgba(0,0,0,0.15);
+        }
+
+        h2{
+            text-align:center;
+            margin-bottom:20px;
+        }
+
+        .tabs{
+            display:flex;
+            margin-bottom:20px;
+        }
+
+        .tabs button{
+            flex:1;
+            padding:12px;
+            border:none;
+            background:#ddd;
+            cursor:pointer;
+            font-size:16px;
+            transition:.3s;
+        }
+
+        .tabs button.active{
+            background:#007BFF;
+            color:white;
+        }
+
+        form{
+            display:none;
+        }
+
+        form.active{
+            display:block;
+        }
+
+        input{
+            width:100%;
+            padding:12px;
+            margin:10px 0;
+            border:1px solid #ccc;
+            border-radius:5px;
+            font-size:15px;
+        }
+
+        button.submit{
+            width:100%;
+            padding:12px;
+            background:#007BFF;
+            color:white;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+            font-size:16px;
+        }
+
+        button.submit:hover{
+            background:#0056b3;
+        }
+
+        .message{
+            margin-top:15px;
+            text-align:center;
+            color:red;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>Weekly Schedule</h2>
+
+    <div class="tabs">
+        <button id="loginTab" class="active">Log In</button>
+        <button id="registerTab">Register</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="active" action="/login" method="POST">
+
+        <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            required
+        >
+
+        <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+        >
+
+        <button class="submit" type="submit">
+            Log In
+        </button>
+
+    </form>
+
+    <!-- Register Form -->
+    <form id="registerForm" action="/register" method="POST">
+
+        <input
+            type="text"
+            name="username"
+            placeholder="Choose a username"
+            required
+        >
+
+        <input
+            type="password"
+            name="password"
+            placeholder="Choose a password"
+            required
+        >
+
+        <button class="submit" type="submit">
+            Create Account
+        </button>
+
+    </form>
+
+    <div class="message" id="message"></div>
+
+</div>
+
+<script>
+
+const loginTab = document.getElementById("loginTab");
+const registerTab = document.getElementById("registerTab");
+
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+
+loginTab.onclick = () => {
+    loginTab.classList.add("active");
+    registerTab.classList.remove("active");
+
+    loginForm.classList.add("active");
+    registerForm.classList.remove("active");
+}
+
+registerTab.onclick = () => {
+    registerTab.classList.add("active");
+    loginTab.classList.remove("active");
+
+    registerForm.classList.add("active");
+    loginForm.classList.remove("active");
+}
+
+
+</script>
+
+</body>
+</html>
