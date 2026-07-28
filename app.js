@@ -190,8 +190,8 @@ app.get("/logout", (req, res) => {
 // Start Server
 // ============================
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+    console.log("Server running on port 10.70.248.190:3000");
 });
 
-// test2
+// testing phone connection
