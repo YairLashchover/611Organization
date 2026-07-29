@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="he">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Calendar</title>
+
+    <link rel="stylesheet" href="calendar.css">
+
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="back">
+
+        <button onclick="window.location.href='/choice'">
+            ← חזרה
+        </button>
+
+    </div>
+
+    <div class="username">
+
+        <span id="username"></span>
+
+    </div>
+
+</header>
+
+
+<div class="calendar-container">
+
+    <div class="week">
+
+        <h2>השבוע</h2>
+
+        <div class="days" id="thisWeek"></div>
+
+    </div>
+
+
+    <div class="week">
+
+        <h2>השבוע הבא</h2>
+
+        <div class="days" id="nextWeek"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+// Username
+fetch("/user")
+.then(r=>r.json())
+.then(data=>{
+    document.getElementById("username").textContent="שלום " + data.username;
+});
+
+const dayNames=[
+"Sunday",
+"Monday",
+"Tuesday",
+"Wednesday",
+"Thursday",
+"Friday",
+"Saturday"
+];
+
+const today=new Date();
+
+const currentDay=today.getDay();
+
+
+// Sunday of current week
+const sunday=new Date(today);
+
+sunday.setDate(today.getDate()-currentDay);
+
+
+function createWeek(container,startDate,isCurrentWeek){
+
+    const div=document.getElementById(container);
+
+    for(let i=0;i<7;i++){
+
+        const d=new Date(startDate);
+
+        d.setDate(startDate.getDate()+i);
+
+        const card=document.createElement("div");
+
+        card.className="day";
+
+        if(isCurrentWeek && i<currentDay){
+
+            card.classList.add("past");
+
+        }
+
+        card.innerHTML=
+        `
+        <h3>${dayNames[i]}</h3>
+        <p>${d.getDate()}/${d.getMonth()+1}</p>
+        `;
+
+        div.appendChild(card);
+
+    }
+
+}
+
+createWeek("thisWeek",sunday,true);
+
+const nextSunday=new Date(sunday);
+
+nextSunday.setDate(sunday.getDate()+7);
+
+createWeek("nextWeek",nextSunday,false);
+
+</script>
+
+</body>
+
+</html>

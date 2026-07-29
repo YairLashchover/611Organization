@@ -86,6 +86,23 @@ app.get("/choice",(req,res)=>{
 
 
 // ============================
+// Calendar Page
+// ============================
+
+app.get("/calendar", (req, res) => {
+
+    if (!req.session.user) {
+        return res.redirect("/");
+    }
+
+    res.sendFile(
+        path.join(__dirname, "public", "calendar.html")
+    );
+
+});
+
+
+// ============================
 // Current User
 // ============================
 
