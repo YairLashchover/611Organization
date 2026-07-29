@@ -1,0 +1,223 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+
+/* ============================
+   Background Image
+============================ */
+
+body{
+
+    background-image:
+    linear-gradient(
+        rgba(234, 238, 239, 0.562),
+        rgba(0, 0, 0, 0.671)
+    ),
+    url("https://upload.wikimedia.org/wikipedia/commons/e/ea/IDF_Gdud_Eitam_611_Artillery.png?utm_source=he.wikipedia.org&utm_campaign=index&utm_content=original");
+
+
+    background-size:cover;
+
+    background-position:center;
+
+    background-repeat:no-repeat;
+
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    height:100vh;
+
+}
+
+
+
+/* ============================
+   Main Container
+============================ */
+
+
+.container{
+
+    width:380px;
+
+    background:white;
+
+    padding:30px;
+
+    border-radius:10px;
+
+    box-shadow:0 0 15px rgba(0,0,0,0.3);
+
+}
+
+
+
+
+
+h2{
+
+    text-align:center;
+
+    margin-bottom:20px;
+
+}
+
+
+
+
+
+/* ============================
+   Tabs
+============================ */
+
+
+.tabs{
+
+    display:flex;
+
+    margin-bottom:20px;
+
+}
+
+
+
+
+
+.tabs button{
+
+    flex:1;
+
+    padding:12px;
+
+    border:none;
+
+    background:#ddd;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+}
+
+
+
+
+
+.tabs button.active{
+
+    background:#007BFF;
+
+    color:white;
+
+}
+
+
+
+
+
+
+/* ============================
+   Forms
+============================ */
+
+
+form{
+
+    display:none;
+
+}
+
+
+
+
+
+form.active{
+
+    display:block;
+
+}
+
+
+
+
+
+input{
+
+    width:100%;
+
+    padding:12px;
+
+    margin:10px 0;
+
+    border:1px solid #ccc;
+
+    border-radius:5px;
+
+}
+
+
+
+
+
+
+/* ============================
+   Submit Button
+============================ */
+
+
+button.submit{
+
+    width:100%;
+
+    padding:12px;
+
+    background:#007BFF;
+
+    color:white;
+
+    border:none;
+
+    border-radius:5px;
+
+    cursor:pointer;
+
+}
+
+
+
+
+
+button.submit:hover{
+
+    background:#0056b3;
+
+}
+
+
+
+
+
+
+
+/* ============================
+   Messages
+============================ */
+
+
+.message{
+
+    margin-top:15px;
+
+    text-align:center;
+
+    color:red;
+
+}
