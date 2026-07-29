@@ -103,6 +103,39 @@ const Task = mongoose.model("Task", taskSchema);
 
 
 // ============================
+// Day Note Schema (admin-editable
+// free text shown in the day popup)
+// ============================
+
+const dayNoteSchema = new mongoose.Schema({
+
+    date:{
+        type:String,
+        required:true,
+        unique:true
+    },
+
+    content:{
+        type:String,
+        default:""
+    },
+
+    updatedBy:{
+        type:String,
+        default:""
+    },
+
+    updatedAt:{
+        type:Date,
+        default:Date.now
+    }
+
+});
+
+const DayNote = mongoose.model("DayNote", dayNoteSchema);
+
+
+// ============================
 // Home Page
 // ============================
 
@@ -422,6 +455,77 @@ app.delete("/api/tasks/:id", async(req,res)=>{
 
 });
 
+
+// ============================
+// Day Notes API (admin-editable
+// popup content, one blob per date)
+// ============================
+
+// GET /api/daynotes/:date  -> { date, content }
+// Anyone logged in can read it.
+app.get("/api/daynotes/:date", async(req,res)=>{
+
+    if(!req.session.user){
+        return res.status(401).json({error:"Not logged in"});
+    }
+
+    try{
+
+        const note = await DayNote.findOne({date:req.params.date});
+
+        res.json({
+            date:req.params.date,
+            content: note ? note.content : ""
+        });
+
+    }catch(err){
+
+        console.log(err);
+        res.status(500).json({error:"Server error"});
+
+    }
+
+});
+
+
+// PUT /api/daynotes/:date  { content }
+// Only admins may write. Creates the note if it doesn't exist yet.
+app.put("/api/daynotes/:date", async(req,res)=>{
+
+    if(!req.session.user){
+        return res.status(401).json({error:"Not logged in"});
+    }
+
+    if(!req.session.isAdmin){
+        return res.status(403).json({error:"Admins only"});
+    }
+
+    try{
+
+        const {content} = req.body;
+
+        const note = await DayNote.findOneAndUpdate(
+            {date:req.params.date},
+            {
+                content: content || "",
+                updatedBy: req.session.user,
+                updatedAt: Date.now()
+            },
+            {upsert:true, new:true}
+        );
+
+        res.json(note);
+
+    }catch(err){
+
+        console.log(err);
+        res.status(500).json({error:"Server error"});
+
+    }
+
+});
+
+
 // ============================
 // Dashboard
 // ============================
@@ -473,7 +577,7 @@ app.get("/logout",(req,res)=>{
 app.listen(PORT,"0.0.0.0",()=>{
 
     console.log(
-        "Server running on http://10.70.248.19(0):3000"
+        "Server running on http://10.70.248.190:3000"
     );
 
 });

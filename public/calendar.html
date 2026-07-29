@@ -70,7 +70,7 @@
 
         <div class="modal-body" id="modalBody">
 
-            <div class="modal-empty">אין עדיין משימות</div>
+            <div class="modal-empty">טוען...</div>
 
         </div>
 
@@ -81,7 +81,7 @@
 <script>
 
 // Will hold whether the logged-in account is an admin,
-// decided once /user responds (see loadUser below)
+// decided once /user responds (see fetch("/user") below)
 let isAdmin = false;
 
 const dayNames=[
@@ -103,6 +103,19 @@ const currentDay=today.getDay();
 const sunday=new Date(today);
 
 sunday.setDate(today.getDate()-currentDay);
+
+
+// Turn a Date into "YYYY-MM-DD" so it can be used as a
+// stable key for the DayNote API (independent of locale/format)
+function toISODate(d){
+
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+
+    return `${y}-${m}-${day}`;
+
+}
 
 
 function createWeek(container,startDate,isCurrentWeek){
@@ -199,11 +212,32 @@ const modalDate = document.getElementById("modalDate");
 const modalBody = document.getElementById("modalBody");
 const modalClose = document.getElementById("modalClose");
 
-function openTaskModal(date, editMode){
+async function openTaskModal(date, editMode){
 
     const label = `${dayNames[date.getDay()]} ${date.getDate()}/${date.getMonth()+1}`;
+    const isoDate = toISODate(date);
 
     modalDate.textContent = label;
+    modalBody.innerHTML = `<div class="modal-empty">טוען...</div>`;
+    taskModal.classList.add("active");
+
+    // Load whatever is currently saved for this date
+    let content = "";
+
+    try{
+
+        const res = await fetch(`/api/daynotes/${isoDate}`);
+
+        if(res.ok){
+            const data = await res.json();
+            content = data.content || "";
+        }
+
+    }catch(err){
+
+        console.log("Failed to load day note", err);
+
+    }
 
     if(editMode){
 
@@ -211,27 +245,47 @@ function openTaskModal(date, editMode){
             `<textarea id="modalEditArea" class="modal-edit-area" placeholder="כתוב כאן משימות..."></textarea>
             <button type="button" class="modal-save-btn" id="modalSaveBtn">שמור</button>`;
 
-        document.getElementById("modalSaveBtn").addEventListener("click", ()=>{
+        document.getElementById("modalEditArea").value = content;
 
-            const text = document.getElementById("modalEditArea").value.trim();
+        document.getElementById("modalSaveBtn").addEventListener("click", async ()=>{
 
-            modalBody.innerHTML = text
-                ? `<div class="modal-text"></div>`
-                : `<div class="modal-empty">אין עדיין משימות</div>`;
+            const newText = document.getElementById("modalEditArea").value.trim();
 
-            if(text){
-                modalBody.querySelector(".modal-text").textContent = text;
+            try{
+
+                await fetch(`/api/daynotes/${isoDate}`, {
+                    method:"PUT",
+                    headers:{"Content-Type":"application/json"},
+                    body: JSON.stringify({content:newText})
+                });
+
+            }catch(err){
+
+                console.log("Failed to save day note", err);
+
             }
+
+            renderNoteView(newText);
 
         });
 
     } else {
 
-        modalBody.innerHTML = `<div class="modal-empty">אין עדיין משימות</div>`;
+        renderNoteView(content);
 
     }
 
-    taskModal.classList.add("active");
+}
+
+function renderNoteView(content){
+
+    modalBody.innerHTML = content
+        ? `<div class="modal-text"></div>`
+        : `<div class="modal-empty">אין עדיין משימות</div>`;
+
+    if(content){
+        modalBody.querySelector(".modal-text").textContent = content;
+    }
 
 }
 
