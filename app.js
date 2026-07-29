@@ -275,7 +275,7 @@ app.get("/logout",(req,res)=>{
 app.listen(PORT,"0.0.0.0",()=>{
 
     console.log(
-        "Server running on http://10.70.248.190:3000"
+        "Server running on http://10.70.248.19(0):3000"
     );
 
 });
