@@ -146,3 +146,255 @@ body{
     color:#666;
 
 }
+
+
+/* ============================
+   Day card action buttons
+   ============================ */
+
+.day-actions{
+
+    display:flex;
+
+    gap:8px;
+
+    margin-top:14px;
+
+    opacity:0;
+
+    transform:translateY(6px);
+
+    pointer-events:none;
+
+    transition:opacity .18s ease, transform .18s ease;
+
+}
+
+.day:hover .day-actions{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+    pointer-events:auto;
+
+}
+
+.day-btn{
+
+    border:none;
+
+    border-radius:6px;
+
+    padding:6px 12px;
+
+    font-size:12px;
+
+    cursor:pointer;
+
+    background:#007BFF;
+
+    color:white;
+
+}
+
+.day-btn:hover{
+
+    background:#005ec2;
+
+}
+
+.edit-btn{
+
+    background:#28a745;
+
+}
+
+.edit-btn:hover{
+
+    background:#1e7e34;
+
+}
+
+
+/* ============================
+   Task Popup
+   ============================ */
+
+.modal-overlay{
+
+    display:none;
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.45);
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:100;
+
+}
+
+.modal-overlay.active{
+
+    display:flex;
+
+}
+
+.modal-box{
+
+    background:white;
+
+    width:90%;
+
+    max-width:420px;
+
+    border-radius:12px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+
+    padding:25px;
+
+    animation:modalAppear .2s ease;
+
+}
+
+@keyframes modalAppear{
+
+    from{
+
+        opacity:0;
+        transform:translateY(15px);
+
+    }
+
+    to{
+
+        opacity:1;
+        transform:translateY(0);
+
+    }
+
+}
+
+.modal-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:15px;
+
+}
+
+.modal-header h3{
+
+    font-size:20px;
+
+}
+
+.modal-close{
+
+    background:none;
+
+    border:none;
+
+    font-size:22px;
+
+    line-height:1;
+
+    cursor:pointer;
+
+    color:#888;
+
+}
+
+.modal-close:hover{
+
+    color:#333;
+
+}
+
+.modal-body{
+
+    min-height:120px;
+
+}
+
+.modal-empty{
+
+    color:#999;
+
+    text-align:center;
+
+    padding:30px 0;
+
+    font-size:14px;
+
+}
+
+.modal-text{
+
+    white-space:pre-wrap;
+
+    font-size:14px;
+
+    color:#333;
+
+    line-height:1.5;
+
+}
+
+.modal-edit-area{
+
+    width:100%;
+
+    min-height:120px;
+
+    padding:10px;
+
+    border:1px solid #ccc;
+
+    border-radius:6px;
+
+    font-family:Arial, Helvetica, sans-serif;
+
+    font-size:14px;
+
+    resize:vertical;
+
+}
+
+.modal-save-btn{
+
+    margin-top:12px;
+
+    width:100%;
+
+    padding:10px;
+
+    border:none;
+
+    border-radius:6px;
+
+    background:#007BFF;
+
+    color:white;
+
+    font-size:14px;
+
+    cursor:pointer;
+
+}
+
+.modal-save-btn:hover{
+
+    background:#005ec2;
+
+}

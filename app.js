@@ -54,6 +54,53 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema, "users");
 const Admin = mongoose.model("Admin", userSchema, "admins");
 
+// ============================
+// Task Schema (calendar slots)
+// ============================
+
+const taskSchema = new mongoose.Schema({
+
+    username:{
+        type:String,
+        required:true
+    },
+
+    date:{
+        type:String,
+        required:true
+    },
+
+    hour:{
+        type:Number,
+        min:0,
+        max:23
+    },
+
+    title:{
+        type:String,
+        required:true,
+        trim:true
+    },
+
+    notes:{
+        type:String,
+        default:""
+    },
+
+    color:{
+        type:String,
+        default:"teal"
+    },
+
+    updatedAt:{
+        type:Date,
+        default:Date.now
+    }
+
+});
+
+const Task = mongoose.model("Task", taskSchema);
+
 
 // ============================
 // Home Page
@@ -236,6 +283,144 @@ app.post("/login", async(req,res)=>{
 
 });
 
+// ============================
+// Tasks API (calendar slots)
+// ============================
+
+app.get("/api/tasks", async(req,res)=>{
+
+    if(!req.session.user){
+        return res.status(401).json({error:"Not logged in"});
+    }
+
+    try{
+
+        const {start,end} = req.query;
+
+        const query = {username:req.session.user};
+
+        if(start && end){
+            query.date = {$gte:start, $lte:end};
+        }
+
+        const tasks = await Task.find(query).sort({date:1, hour:1});
+
+        res.json(tasks);
+
+    }catch(err){
+
+        console.log(err);
+        res.status(500).json({error:"Server error"});
+
+    }
+
+});
+
+
+app.post("/api/tasks", async(req,res)=>{
+
+    if(!req.session.user){
+        return res.status(401).json({error:"Not logged in"});
+    }
+
+    try{
+
+        const {date,hour,title,notes,color} = req.body;
+
+        if(!date || !title){
+            return res.status(400).json({error:"Missing date or title"});
+        }
+
+        const task = new Task({
+            username:req.session.user,
+            date,
+            hour,
+            title,
+            notes:notes || "",
+            color:color || "teal"
+        });
+
+        await task.save();
+
+        res.status(201).json(task);
+
+    }catch(err){
+
+        console.log(err);
+        res.status(500).json({error:"Server error"});
+
+    }
+
+});
+
+
+app.put("/api/tasks/:id", async(req,res)=>{
+
+    if(!req.session.user){
+        return res.status(401).json({error:"Not logged in"});
+    }
+
+    try{
+
+        const {title,notes,color,date,hour} = req.body;
+
+        const task = await Task.findOne({
+            _id:req.params.id,
+            username:req.session.user
+        });
+
+        if(!task){
+            return res.status(404).json({error:"Task not found"});
+        }
+
+        if(title!==undefined) task.title = title;
+        if(notes!==undefined) task.notes = notes;
+        if(color!==undefined) task.color = color;
+        if(date!==undefined) task.date = date;
+        if(hour!==undefined) task.hour = hour;
+        task.updatedAt = Date.now();
+
+        await task.save();
+
+        res.json(task);
+
+    }catch(err){
+
+        console.log(err);
+        res.status(500).json({error:"Server error"});
+
+    }
+
+});
+
+
+app.delete("/api/tasks/:id", async(req,res)=>{
+
+    if(!req.session.user){
+        return res.status(401).json({error:"Not logged in"});
+    }
+
+    try{
+
+        const result = await Task.findOneAndDelete({
+            _id:req.params.id,
+            username:req.session.user
+        });
+
+        if(!result){
+            return res.status(404).json({error:"Task not found"});
+        }
+
+        res.json({success:true});
+
+    }catch(err){
+
+        console.log(err);
+        res.status(500).json({error:"Server error"});
+
+    }
+
+});
 
 // ============================
 // Dashboard
