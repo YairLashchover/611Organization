@@ -33,7 +33,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 
 // ============================
-// User Schema
+// User/Admin Schema
 // ============================
 
 const userSchema = new mongoose.Schema({
@@ -51,8 +51,8 @@ const userSchema = new mongoose.Schema({
 
 });
 
-
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema, "users");
+const Admin = mongoose.model("Admin", userSchema, "admins");
 
 
 // ============================
@@ -89,14 +89,14 @@ app.get("/choice",(req,res)=>{
 // Calendar Page
 // ============================
 
-app.get("/calendar", (req, res) => {
+app.get("/calendar",(req,res)=>{
 
-    if (!req.session.user) {
+    if(!req.session.user){
         return res.redirect("/");
     }
 
     res.sendFile(
-        path.join(__dirname, "public", "calendar.html")
+        path.join(__dirname,"public","calendar.html")
     );
 
 });
@@ -109,11 +109,19 @@ app.get("/calendar", (req, res) => {
 app.get("/user",(req,res)=>{
 
     if(!req.session.user){
-        return res.json({username:""});
+
+        return res.json({
+            username:"",
+            isAdmin:false
+        });
+
     }
 
     res.json({
-        username:req.session.user
+
+        username:req.session.user,
+        isAdmin:req.session.isAdmin
+
     });
 
 });
@@ -129,11 +137,10 @@ app.post("/register", async(req,res)=>{
 
         const {username,password}=req.body;
 
-
         const existingUser = await User.findOne({username});
+        const existingAdmin = await Admin.findOne({username});
 
-
-        if(existingUser){
+        if(existingUser || existingAdmin){
 
             return res.redirect(
                 "/?error=Username%20already%20exists"
@@ -141,11 +148,7 @@ app.post("/register", async(req,res)=>{
 
         }
 
-
-        const hashedPassword =
-            await bcrypt.hash(password,10);
-
-
+        const hashedPassword = await bcrypt.hash(password,10);
 
         const newUser = new User({
 
@@ -154,17 +157,12 @@ app.post("/register", async(req,res)=>{
 
         });
 
-
-
         await newUser.save();
 
-
-
         req.session.user = newUser.username;
-
+        req.session.isAdmin = false;
 
         res.redirect("/choice");
-
 
     }catch(err){
 
@@ -187,15 +185,22 @@ app.post("/login", async(req,res)=>{
 
     try{
 
-
         const {username,password}=req.body;
 
+        let account = await User.findOne({username});
+        let isAdmin = false;
 
-        const user = await User.findOne({username});
+        if(!account){
 
+            account = await Admin.findOne({username});
 
+            if(account){
+                isAdmin = true;
+            }
 
-        if(!user){
+        }
+
+        if(!account){
 
             return res.redirect(
                 "/?error=User%20not%20found"
@@ -203,12 +208,8 @@ app.post("/login", async(req,res)=>{
 
         }
 
-
-
         const validPassword =
-            await bcrypt.compare(password,user.password);
-
-
+            await bcrypt.compare(password,account.password);
 
         if(!validPassword){
 
@@ -218,28 +219,20 @@ app.post("/login", async(req,res)=>{
 
         }
 
-
-
-        req.session.user=user.username;
-
+        req.session.user = account.username;
+        req.session.isAdmin = isAdmin;
 
         res.redirect("/choice");
 
-
-
     }catch(err){
 
-
         console.log(err);
-
 
         res.redirect(
             "/?error=Server%20error"
         );
 
-
     }
-
 
 });
 
@@ -250,7 +243,6 @@ app.post("/login", async(req,res)=>{
 
 app.get("/dashboard",(req,res)=>{
 
-
     if(!req.session.user){
 
         return res.send(
@@ -259,11 +251,17 @@ app.get("/dashboard",(req,res)=>{
 
     }
 
+    if(req.session.isAdmin){
+
+        return res.send(
+            `Welcome Admin ${req.session.user}!`
+        );
+
+    }
 
     res.send(
         `Welcome ${req.session.user}!`
     );
-
 
 });
 
@@ -274,13 +272,11 @@ app.get("/dashboard",(req,res)=>{
 
 app.get("/logout",(req,res)=>{
 
-
     req.session.destroy(()=>{
 
         res.redirect("/");
 
     });
-
 
 });
 
