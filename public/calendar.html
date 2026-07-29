@@ -80,12 +80,9 @@
 
 <script>
 
-// Username
-fetch("/user")
-.then(r=>r.json())
-.then(data=>{
-    document.getElementById("username").textContent="שלום " + data.username;
-});
+// Will hold whether the logged-in account is an admin,
+// decided once /user responds (see loadUser below)
+let isAdmin = false;
 
 const dayNames=[
 "Sunday",
@@ -132,11 +129,29 @@ function createWeek(container,startDate,isCurrentWeek){
         `
         <h3>${dayNames[i]}</h3>
         <p>${d.getDate()}/${d.getMonth()+1}</p>
+        <div class="day-actions">
+            <button type="button" class="day-btn view-btn">משימות</button>
+            ${isAdmin ? '<button type="button" class="day-btn edit-btn">עריכה</button>' : ""}
+        </div>
         `;
-        
-        card.addEventListener("click", ()=>{
-            openTaskModal(d);
+
+        const viewBtn = card.querySelector(".view-btn");
+
+        viewBtn.addEventListener("click", (e)=>{
+            e.stopPropagation();
+            openTaskModal(d,false);
         });
+
+        const editBtn = card.querySelector(".edit-btn");
+
+        if(editBtn){
+
+            editBtn.addEventListener("click", (e)=>{
+                e.stopPropagation();
+                openTaskModal(d,true);
+            });
+
+        }
 
         div.appendChild(card);
 
@@ -144,13 +159,36 @@ function createWeek(container,startDate,isCurrentWeek){
 
 }
 
-createWeek("thisWeek",sunday,true);
+function buildCalendar(){
 
-const nextSunday=new Date(sunday);
+    // Clear in case this ever gets called more than once
+    document.getElementById("thisWeek").innerHTML = "";
+    document.getElementById("nextWeek").innerHTML = "";
 
-nextSunday.setDate(sunday.getDate()+7);
+    createWeek("thisWeek",sunday,true);
 
-createWeek("nextWeek",nextSunday,false);
+    const nextSunday=new Date(sunday);
+
+    nextSunday.setDate(sunday.getDate()+7);
+
+    createWeek("nextWeek",nextSunday,false);
+
+}
+
+
+// Username + admin check, then build the calendar
+fetch("/user")
+.then(r=>r.json())
+.then(data=>{
+
+    document.getElementById("username").textContent="שלום " + data.username;
+
+    isAdmin = !!data.isAdmin;
+
+    buildCalendar();
+
+});
+
 
 // ============================
 // Task Popup
@@ -161,13 +199,37 @@ const modalDate = document.getElementById("modalDate");
 const modalBody = document.getElementById("modalBody");
 const modalClose = document.getElementById("modalClose");
 
-function openTaskModal(date){
+function openTaskModal(date, editMode){
 
     const label = `${dayNames[date.getDay()]} ${date.getDate()}/${date.getMonth()+1}`;
 
     modalDate.textContent = label;
 
-    modalBody.innerHTML = `<div class="modal-empty">אין עדיין משימות</div>`;
+    if(editMode){
+
+        modalBody.innerHTML =
+            `<textarea id="modalEditArea" class="modal-edit-area" placeholder="כתוב כאן משימות..."></textarea>
+            <button type="button" class="modal-save-btn" id="modalSaveBtn">שמור</button>`;
+
+        document.getElementById("modalSaveBtn").addEventListener("click", ()=>{
+
+            const text = document.getElementById("modalEditArea").value.trim();
+
+            modalBody.innerHTML = text
+                ? `<div class="modal-text"></div>`
+                : `<div class="modal-empty">אין עדיין משימות</div>`;
+
+            if(text){
+                modalBody.querySelector(".modal-text").textContent = text;
+            }
+
+        });
+
+    } else {
+
+        modalBody.innerHTML = `<div class="modal-empty">אין עדיין משימות</div>`;
+
+    }
 
     taskModal.classList.add("active");
 
@@ -192,6 +254,7 @@ document.addEventListener("keydown", (e)=>{
         closeTaskModal();
     }
 });
+
 </script>
 
 </body>
