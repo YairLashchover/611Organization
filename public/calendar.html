@@ -54,6 +54,29 @@
 
 </div>
 
+<!-- Task Popup -->
+
+<div class="modal-overlay" id="taskModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h3 id="modalDate"></h3>
+
+            <button class="modal-close" id="modalClose">&times;</button>
+
+        </div>
+
+        <div class="modal-body" id="modalBody">
+
+            <div class="modal-empty">אין עדיין משימות</div>
+
+        </div>
+
+    </div>
+
+</div>
 
 <script>
 
@@ -110,6 +133,10 @@ function createWeek(container,startDate,isCurrentWeek){
         <h3>${dayNames[i]}</h3>
         <p>${d.getDate()}/${d.getMonth()+1}</p>
         `;
+        
+        card.addEventListener("click", ()=>{
+            openTaskModal(d);
+        });
 
         div.appendChild(card);
 
@@ -125,6 +152,46 @@ nextSunday.setDate(sunday.getDate()+7);
 
 createWeek("nextWeek",nextSunday,false);
 
+// ============================
+// Task Popup
+// ============================
+
+const taskModal = document.getElementById("taskModal");
+const modalDate = document.getElementById("modalDate");
+const modalBody = document.getElementById("modalBody");
+const modalClose = document.getElementById("modalClose");
+
+function openTaskModal(date){
+
+    const label = `${dayNames[date.getDay()]} ${date.getDate()}/${date.getMonth()+1}`;
+
+    modalDate.textContent = label;
+
+    modalBody.innerHTML = `<div class="modal-empty">אין עדיין משימות</div>`;
+
+    taskModal.classList.add("active");
+
+}
+
+function closeTaskModal(){
+
+    taskModal.classList.remove("active");
+
+}
+
+modalClose.addEventListener("click", closeTaskModal);
+
+taskModal.addEventListener("click", (e)=>{
+    if(e.target === taskModal){
+        closeTaskModal();
+    }
+});
+
+document.addEventListener("keydown", (e)=>{
+    if(e.key === "Escape" && taskModal.classList.contains("active")){
+        closeTaskModal();
+    }
+});
 </script>
 
 </body>

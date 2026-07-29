@@ -117,6 +117,8 @@ body{
 
     transition:.2s;
 
+    cursor:pointer;
+
 }
 
 .day:hover{
@@ -144,5 +146,127 @@ body{
     background:#cfcfcf;
 
     color:#666;
+
+}
+
+/* ============================
+   Task Popup
+   ============================ */
+
+.modal-overlay{
+
+    display:none;
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.45);
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:100;
+
+}
+
+.modal-overlay.active{
+
+    display:flex;
+
+}
+
+.modal-box{
+
+    background:white;
+
+    width:90%;
+
+    max-width:420px;
+
+    border-radius:12px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+
+    padding:25px;
+
+    animation:modalAppear .2s ease;
+
+}
+
+@keyframes modalAppear{
+
+    from{
+
+        opacity:0;
+        transform:translateY(15px);
+
+    }
+
+    to{
+
+        opacity:1;
+        transform:translateY(0);
+
+    }
+
+}
+
+.modal-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:15px;
+
+}
+
+.modal-header h3{
+
+    font-size:20px;
+
+}
+
+.modal-close{
+
+    background:none;
+
+    border:none;
+
+    font-size:22px;
+
+    line-height:1;
+
+    cursor:pointer;
+
+    color:#888;
+
+}
+
+.modal-close:hover{
+
+    color:#333;
+
+}
+
+.modal-body{
+
+    min-height:120px;
+
+}
+
+.modal-empty{
+
+    color:#999;
+
+    text-align:center;
+
+    padding:30px 0;
+
+    font-size:14px;
 
 }
