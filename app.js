@@ -500,6 +500,25 @@ app.put("/api/daynotes/:date", async(req,res)=>{
         return res.status(403).json({error:"Admins only"});
     }
 
+        // Prevent editing past dates
+    const today = new Date();
+
+    today.setHours(0,0,0,0);
+
+
+    const requestedDate = new Date(req.params.date);
+
+    requestedDate.setHours(0,0,0,0);
+
+
+    if(requestedDate < today){
+
+        return res.status(403).json({
+            error:"Cannot edit past dates"
+        });
+
+    }    
+
     try{
 
         const {content} = req.body;
