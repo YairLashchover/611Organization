@@ -93,6 +93,8 @@ body{
 
     gap:20px;
 
+    direction:rtl;
+
 }
 
 .day{
