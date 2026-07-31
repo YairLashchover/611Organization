@@ -7,6 +7,7 @@ const path = require("path");
 const app = express();
 const PORT = 3000;
 
+
 // ============================
 // MongoDB Connection
 // ============================
@@ -16,25 +17,35 @@ mongoose.connect("mongodb+srv://Yair:Yair2004@cluster0.fg959i9.mongodb.net/")
 .catch(err => console.log(err));
 
 
+
 // ============================
 // Middleware
 // ============================
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended:true }));
 app.use(express.json());
 
+
 app.use(session({
-    secret: "weeklyScheduleSecret",
-    resave: false,
-    saveUninitialized: false
+
+    secret:"weeklyScheduleSecret",
+
+    resave:false,
+
+    saveUninitialized:false
+
 }));
 
-app.use(express.static(path.join(__dirname, "public")));
+
+app.use(express.static(path.join(__dirname,"public")));
+
+
 
 
 // ============================
 // User/Admin Schema
 // ============================
+
 
 const userSchema = new mongoose.Schema({
 
@@ -44,6 +55,7 @@ const userSchema = new mongoose.Schema({
         unique:true
     },
 
+
     password:{
         type:String,
         required:true
@@ -51,552 +63,996 @@ const userSchema = new mongoose.Schema({
 
 });
 
-const User = mongoose.model("User", userSchema, "users");
-const Admin = mongoose.model("Admin", userSchema, "admins");
+
+
+const User = mongoose.model(
+    "User",
+    userSchema,
+    "users"
+);
+
+
+const Admin = mongoose.model(
+    "Admin",
+    userSchema,
+    "admins"
+);
+
+
+
 
 // ============================
-// Task Schema (calendar slots)
+// Assignment Schema
+// ============================
+// Stores kitchen / guarding tasks
 // ============================
 
-const taskSchema = new mongoose.Schema({
 
-    username:{
+const assignmentSchema = new mongoose.Schema({
+
+
+    assignedUser:{
+
         type:String,
+
         required:true
+
     },
+
+
+    taskType:{
+
+        type:String,
+
+        enum:[
+            "Kitchen",
+            "Guarding"
+        ],
+
+        required:true
+
+    },
+
 
     date:{
+
         type:String,
+
         required:true
+
     },
 
-    hour:{
-        type:Number,
-        min:0,
-        max:23
-    },
 
-    title:{
+    startTime:{
+
         type:String,
-        required:true,
-        trim:true
+
+        required:true
+
     },
 
-    notes:{
+
+    endTime:{
+
         type:String,
-        default:""
+
+        required:true
+
     },
 
-    color:{
+
+    createdBy:{
+
         type:String,
-        default:"teal"
+
+        required:true
+
     },
 
-    updatedAt:{
+
+    createdAt:{
+
         type:Date,
+
         default:Date.now
+
     }
+
 
 });
 
-const Task = mongoose.model("Task", taskSchema);
 
 
-// ============================
-// Day Note Schema (admin-editable
-// free text shown in the day popup)
-// ============================
+const Assignment = mongoose.model(
+    "Assignment",
+    assignmentSchema
+);
 
-const dayNoteSchema = new mongoose.Schema({
 
-    date:{
-        type:String,
-        required:true,
-        unique:true
-    },
 
-    content:{
-        type:String,
-        default:""
-    },
 
-    updatedBy:{
-        type:String,
-        default:""
-    },
 
-    updatedAt:{
-        type:Date,
-        default:Date.now
-    }
-
-});
-
-const DayNote = mongoose.model("DayNote", dayNoteSchema);
 
 
 // ============================
 // Home Page
 // ============================
 
-app.get("/", (req,res)=>{
+
+app.get("/",(req,res)=>{
+
 
     res.sendFile(
-        path.join(__dirname,"public","verification.html")
+
+        path.join(
+            __dirname,
+            "public",
+            "verification.html"
+        )
+
     );
 
+
 });
+
+
+
+
 
 
 // ============================
 // Choice Page
 // ============================
 
+
 app.get("/choice",(req,res)=>{
 
+
     if(!req.session.user){
+
         return res.redirect("/");
+
     }
 
+
     res.sendFile(
-        path.join(__dirname,"public","choice.html")
+
+        path.join(
+            __dirname,
+            "public",
+            "choice.html"
+        )
+
     );
 
+
 });
+
+
+
+
 
 
 // ============================
 // Calendar Page
 // ============================
 
+
 app.get("/calendar",(req,res)=>{
 
+
     if(!req.session.user){
+
         return res.redirect("/");
+
     }
 
+
     res.sendFile(
-        path.join(__dirname,"public","calendar.html")
+
+        path.join(
+            __dirname,
+            "public",
+            "calendar.html"
+        )
+
     );
 
+
 });
+
+
+
+
+
 
 
 // ============================
 // Current User
 // ============================
 
+
 app.get("/user",(req,res)=>{
+
 
     if(!req.session.user){
 
+
         return res.json({
+
             username:"",
             isAdmin:false
+
         });
 
+
     }
+
+
 
     res.json({
 
         username:req.session.user,
+
         isAdmin:req.session.isAdmin
 
     });
 
+
+
 });
+
+
+
+
+
+
 
 
 // ============================
 // Register
 // ============================
 
-app.post("/register", async(req,res)=>{
+
+app.post("/register",async(req,res)=>{
+
 
     try{
 
-        const {username,password}=req.body;
 
-        const existingUser = await User.findOne({username});
-        const existingAdmin = await Admin.findOne({username});
+        const {
+            username,
+            password
+        } = req.body;
+
+
+
+        const existingUser =
+            await User.findOne({username});
+
+
+        const existingAdmin =
+            await Admin.findOne({username});
+
+
 
         if(existingUser || existingAdmin){
 
+
             return res.redirect(
+
                 "/?error=Username%20already%20exists"
+
             );
+
 
         }
 
-        const hashedPassword = await bcrypt.hash(password,10);
+
+
+
+
+        const hashedPassword =
+            await bcrypt.hash(password,10);
+
+
+
+
 
         const newUser = new User({
 
             username,
+
             password:hashedPassword
 
         });
 
+
+
         await newUser.save();
 
-        req.session.user = newUser.username;
-        req.session.isAdmin = false;
+
+
+
+        req.session.user =
+            newUser.username;
+
+
+        req.session.isAdmin =
+            false;
+
+
 
         res.redirect("/choice");
 
-    }catch(err){
+
+
+    }
+    catch(err){
+
 
         console.log(err);
+
 
         res.redirect(
             "/?error=Server%20error"
         );
 
+
     }
 
+
+
 });
+
+
+
+
+
+
+
 
 
 // ============================
 // Login
 // ============================
 
-app.post("/login", async(req,res)=>{
+
+app.post("/login",async(req,res)=>{
+
 
     try{
 
-        const {username,password}=req.body;
 
-        let account = await User.findOne({username});
-        let isAdmin = false;
+        const {
+            username,
+            password
+        } = req.body;
+
+
+
+        let account =
+            await User.findOne({username});
+
+
+
+        let isAdmin=false;
+
+
+
+
 
         if(!account){
 
-            account = await Admin.findOne({username});
+
+            account =
+                await Admin.findOne({username});
+
+
 
             if(account){
-                isAdmin = true;
+
+                isAdmin=true;
+
             }
 
+
         }
+
+
+
+
 
         if(!account){
 
+
             return res.redirect(
+
                 "/?error=User%20not%20found"
+
             );
+
 
         }
 
+
+
+
+
         const validPassword =
-            await bcrypt.compare(password,account.password);
+            await bcrypt.compare(
+                password,
+                account.password
+            );
+
+
+
+
 
         if(!validPassword){
 
+
             return res.redirect(
+
                 "/?error=Incorrect%20password"
+
             );
+
 
         }
 
-        req.session.user = account.username;
-        req.session.isAdmin = isAdmin;
+
+
+
+
+
+        req.session.user =
+            account.username;
+
+
+
+        req.session.isAdmin =
+            isAdmin;
+
+
+
 
         res.redirect("/choice");
 
-    }catch(err){
+
+
+    }
+    catch(err){
+
 
         console.log(err);
+
+
 
         res.redirect(
+
             "/?error=Server%20error"
+
         );
 
-    }
-
-});
-
-// ============================
-// Tasks API (calendar slots)
-// ============================
-
-app.get("/api/tasks", async(req,res)=>{
-
-    if(!req.session.user){
-        return res.status(401).json({error:"Not logged in"});
-    }
-
-    try{
-
-        const {start,end} = req.query;
-
-        const query = {username:req.session.user};
-
-        if(start && end){
-            query.date = {$gte:start, $lte:end};
-        }
-
-        const tasks = await Task.find(query).sort({date:1, hour:1});
-
-        res.json(tasks);
-
-    }catch(err){
-
-        console.log(err);
-        res.status(500).json({error:"Server error"});
 
     }
+
+
 
 });
 
 
-app.post("/api/tasks", async(req,res)=>{
-
-    if(!req.session.user){
-        return res.status(401).json({error:"Not logged in"});
-    }
-
-    try{
-
-        const {date,hour,title,notes,color} = req.body;
-
-        if(!date || !title){
-            return res.status(400).json({error:"Missing date or title"});
-        }
-
-        const task = new Task({
-            username:req.session.user,
-            date,
-            hour,
-            title,
-            notes:notes || "",
-            color:color || "teal"
-        });
-
-        await task.save();
-
-        res.status(201).json(task);
-
-    }catch(err){
-
-        console.log(err);
-        res.status(500).json({error:"Server error"});
-
-    }
-
-});
 
 
-app.put("/api/tasks/:id", async(req,res)=>{
-
-    if(!req.session.user){
-        return res.status(401).json({error:"Not logged in"});
-    }
-
-    try{
-
-        const {title,notes,color,date,hour} = req.body;
-
-        const task = await Task.findOne({
-            _id:req.params.id,
-            username:req.session.user
-        });
-
-        if(!task){
-            return res.status(404).json({error:"Task not found"});
-        }
-
-        if(title!==undefined) task.title = title;
-        if(notes!==undefined) task.notes = notes;
-        if(color!==undefined) task.color = color;
-        if(date!==undefined) task.date = date;
-        if(hour!==undefined) task.hour = hour;
-        task.updatedAt = Date.now();
-
-        await task.save();
-
-        res.json(task);
-
-    }catch(err){
-
-        console.log(err);
-        res.status(500).json({error:"Server error"});
-
-    }
-
-});
 
 
-app.delete("/api/tasks/:id", async(req,res)=>{
-
-    if(!req.session.user){
-        return res.status(401).json({error:"Not logged in"});
-    }
-
-    try{
-
-        const result = await Task.findOneAndDelete({
-            _id:req.params.id,
-            username:req.session.user
-        });
-
-        if(!result){
-            return res.status(404).json({error:"Task not found"});
-        }
-
-        res.json({success:true});
-
-    }catch(err){
-
-        console.log(err);
-        res.status(500).json({error:"Server error"});
-
-    }
-
-});
 
 
 // ============================
-// Day Notes API (admin-editable
-// popup content, one blob per date)
+// Get All Users
+// Only Admins
 // ============================
 
-// GET /api/daynotes/:date  -> { date, content }
-// Anyone logged in can read it.
-app.get("/api/daynotes/:date", async(req,res)=>{
+
+app.get("/api/users",async(req,res)=>{
+
 
     if(!req.session.user){
-        return res.status(401).json({error:"Not logged in"});
-    }
 
-    try{
-
-        const note = await DayNote.findOne({date:req.params.date});
-
-        res.json({
-            date:req.params.date,
-            content: note ? note.content : ""
+        return res.status(401).json({
+            error:"Not logged in"
         });
 
-    }catch(err){
-
-        console.log(err);
-        res.status(500).json({error:"Server error"});
-
     }
 
-});
 
-
-// PUT /api/daynotes/:date  { content }
-// Only admins may write. Creates the note if it doesn't exist yet.
-app.put("/api/daynotes/:date", async(req,res)=>{
-
-    if(!req.session.user){
-        return res.status(401).json({error:"Not logged in"});
-    }
 
     if(!req.session.isAdmin){
-        return res.status(403).json({error:"Admins only"});
-    }
-
-        // Prevent editing past dates
-    const today = new Date();
-
-    today.setHours(0,0,0,0);
-
-
-    const requestedDate = new Date(req.params.date);
-
-    requestedDate.setHours(0,0,0,0);
-
-
-    if(requestedDate < today){
 
         return res.status(403).json({
-            error:"Cannot edit past dates"
+            error:"Admins only"
         });
 
-    }    
+    }
+
+
 
     try{
 
-        const {content} = req.body;
 
-        const note = await DayNote.findOneAndUpdate(
-            {date:req.params.date},
-            {
-                content: content || "",
-                updatedBy: req.session.user,
-                updatedAt: Date.now()
-            },
-            {upsert:true, new:true}
-        );
+        const users =
+            await User.find({},{
+                username:1,
+                _id:0
+            });
 
-        res.json(note);
 
-    }catch(err){
+
+        const admins =
+            await Admin.find({},{
+                username:1,
+                _id:0
+            });
+
+
+
+        res.json([
+            ...users,
+            ...admins
+        ]);
+
+
+
+    }
+    catch(err){
+
 
         console.log(err);
-        res.status(500).json({error:"Server error"});
+
+
+        res.status(500).json({
+            error:"Server error"
+        });
+
 
     }
 
+
+
 });
+
+
+// ============================
+// Get Assignments
+// ============================
+// Admins see all assignments
+// Regular users see only their assignments
+// ============================
+
+
+app.get("/api/assignments", async(req,res)=>{
+
+
+    if(!req.session.user){
+
+        return res.status(401).json({
+            error:"Not logged in"
+        });
+
+    }
+
+
+
+    try{
+
+
+        const {date} = req.query;
+
+
+
+        let query={};
+
+
+
+        if(req.session.isAdmin){
+
+
+            // Admin sees everything
+
+            if(date){
+
+                query.date=date;
+
+            }
+
+
+        }
+        else{
+
+
+            // User sees only his tasks
+
+            query.assignedUser =
+                req.session.user;
+
+
+            if(date){
+
+                query.date=date;
+
+            }
+
+
+        }
+
+
+
+
+
+        const assignments =
+            await Assignment
+            .find(query)
+            .sort({
+                startTime:1
+            });
+
+
+
+        res.json(assignments);
+
+
+
+    }
+    catch(err){
+
+
+        console.log(err);
+
+
+        res.status(500).json({
+            error:"Server error"
+        });
+
+
+    }
+
+
+
+});
+
+
+
+
+
+
+
+
+
+// ============================
+// Create Assignment
+// Only Admins
+// ============================
+
+
+app.post("/api/assignments",async(req,res)=>{
+
+
+    if(!req.session.user){
+
+        return res.status(401).json({
+            error:"Not logged in"
+        });
+
+    }
+
+
+
+
+    if(!req.session.isAdmin){
+
+        return res.status(403).json({
+            error:"Admins only"
+        });
+
+    }
+
+
+
+
+    try{
+
+
+        const {
+
+            assignedUser,
+
+            taskType,
+
+            date,
+
+            startTime,
+
+            endTime
+
+        } = req.body;
+
+
+
+
+
+        if(
+            !assignedUser ||
+            !taskType ||
+            !date ||
+            !startTime ||
+            !endTime
+        ){
+
+
+            return res.status(400).json({
+
+                error:"Missing information"
+
+            });
+
+
+        }
+
+
+
+
+
+
+
+        const assignment =
+            new Assignment({
+
+                assignedUser,
+
+                taskType,
+
+                date,
+
+                startTime,
+
+                endTime,
+
+                createdBy:req.session.user
+
+            });
+
+
+
+
+
+        await assignment.save();
+
+
+
+
+
+        res.json(assignment);
+
+
+
+    }
+    catch(err){
+
+
+        console.log(err);
+
+
+        res.status(500).json({
+
+            error:"Server error"
+
+        });
+
+
+
+    }
+
+
+
+});
+
+
+
+
+
+
+
+
+
+// ============================
+// Delete Assignment
+// Only Admins
+// ============================
+
+
+app.delete("/api/assignments/:id",async(req,res)=>{
+
+
+    if(!req.session.user){
+
+        return res.status(401).json({
+            error:"Not logged in"
+        });
+
+    }
+
+
+
+
+    if(!req.session.isAdmin){
+
+        return res.status(403).json({
+            error:"Admins only"
+        });
+
+    }
+
+
+
+
+    try{
+
+
+        const deleted =
+            await Assignment.findByIdAndDelete(
+                req.params.id
+            );
+
+
+
+
+        if(!deleted){
+
+
+            return res.status(404).json({
+
+                error:"Assignment not found"
+
+            });
+
+
+        }
+
+
+
+
+        res.json({
+
+            success:true
+
+        });
+
+
+
+    }
+    catch(err){
+
+
+        console.log(err);
+
+
+
+        res.status(500).json({
+
+            error:"Server error"
+
+        });
+
+
+    }
+
+
+
+});
+
+
+
+
+
+
+
 
 
 // ============================
 // Dashboard
 // ============================
 
+
 app.get("/dashboard",(req,res)=>{
 
+
     if(!req.session.user){
+
 
         return res.send(
             "Please log in first."
         );
 
+
     }
+
+
+
 
     if(req.session.isAdmin){
 
+
         return res.send(
+
             `Welcome Admin ${req.session.user}!`
+
         );
+
 
     }
 
+
+
+
     res.send(
+
         `Welcome ${req.session.user}!`
+
     );
 
+
+
 });
+
+
+
+
+
+
+
 
 
 // ============================
 // Logout
 // ============================
 
+
 app.get("/logout",(req,res)=>{
+
 
     req.session.destroy(()=>{
 
+
         res.redirect("/");
+
 
     });
 
+
 });
+
+
+
+
+
+
+
 
 
 // ============================
 // Start Server
 // ============================
 
+
 app.listen(PORT,"0.0.0.0",()=>{
 
+
     console.log(
+
         "Server running on http://10.70.248.190:3000"
+
     );
+
 
 });

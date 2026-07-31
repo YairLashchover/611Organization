@@ -3,88 +3,130 @@
 
 <head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Calendar</title>
+<title>Calendar</title>
 
-    <link rel="stylesheet" href="calendar.css">
+<link rel="stylesheet" href="calendar.css">
 
 </head>
 
+
 <body>
+
 
 <header class="header">
 
-    <div class="back">
 
-        <button onclick="window.location.href='/choice'">
-            ← חזרה
-        </button>
+<div class="back">
 
-    </div>
+<button onclick="window.location.href='/choice'">
+← חזרה
+</button>
 
-    <div class="username">
+</div>
 
-        <span id="username"></span>
 
-    </div>
+<div class="username">
+
+<span id="username"></span>
+
+</div>
+
 
 </header>
 
 
+
+
+
 <div class="calendar-container">
 
-    <div class="week">
 
-        <h2>השבוע</h2>
+<div class="week">
 
-        <div class="days" id="thisWeek"></div>
+<h2>השבוע</h2>
 
-    </div>
-
-
-    <div class="week">
-
-        <h2>השבוע הבא</h2>
-
-        <div class="days" id="nextWeek"></div>
-
-    </div>
+<div class="days" id="thisWeek"></div>
 
 </div>
 
-<!-- Task Popup -->
 
-<div class="modal-overlay" id="taskModal">
 
-    <div class="modal-box">
+<div class="week">
 
-        <div class="modal-header">
+<h2>השבוע הבא</h2>
 
-            <h3 id="modalDate"></h3>
-
-            <button class="modal-close" id="modalClose">&times;</button>
-
-        </div>
-
-        <div class="modal-body" id="modalBody">
-
-            <div class="modal-empty">טוען...</div>
-
-        </div>
-
-    </div>
+<div class="days" id="nextWeek"></div>
 
 </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- Assignment Popup -->
+
+
+<div class="modal-overlay" id="modal">
+
+
+<div class="modal-box">
+
+
+<div class="modal-header">
+
+<h3 id="modalTitle"></h3>
+
+
+<button id="close">
+×
+</button>
+
+
+</div>
+
+
+
+<div id="modalBody">
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
 
 <script>
 
-// Will hold whether the logged-in account is an admin,
-// decided once /user responds (see fetch("/user") below)
-let isAdmin = false;
+
+let isAdmin=false;
+
+let selectedDate=null;
+
+
 
 const dayNames=[
+
 "ראשון",
 "שני",
 "שלישי",
@@ -92,237 +134,732 @@ const dayNames=[
 "חמישי",
 "שישי",
 "שבת"
+
 ];
+
+
 
 const today=new Date();
 
 const currentDay=today.getDay();
 
 
-// Sunday of current week
+
 const sunday=new Date(today);
 
-sunday.setDate(today.getDate()-currentDay);
+sunday.setDate(
+    today.getDate()-currentDay
+);
 
 
-// Turn a Date into "YYYY-MM-DD" so it can be used as a
-// stable key for the DayNote API (independent of locale/format)
-function toISODate(d){
 
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const day = String(d.getDate()).padStart(2,"0");
 
-    return `${y}-${m}-${day}`;
+
+
+function formatDate(date){
+
+
+let y=date.getFullYear();
+
+let m=String(
+    date.getMonth()+1
+).padStart(2,"0");
+
+
+let d=String(
+    date.getDate()
+).padStart(2,"0");
+
+
+return `${y}-${m}-${d}`;
+
 
 }
 
-function isPastDay(date){
 
-    const today = new Date();
 
-    today.setHours(0,0,0,0);
 
-    const checkDate = new Date(date);
 
-    checkDate.setHours(0,0,0,0);
 
-    return checkDate < today;
+
+
+function isPast(date){
+
+
+let now=new Date();
+
+now.setHours(0,0,0,0);
+
+
+let check=new Date(date);
+
+check.setHours(0,0,0,0);
+
+
+
+return check<now;
+
+
+}
+
+
+
+
+
+
+
+
+
+function createWeek(id,start,isCurrent){
+
+
+const container=
+document.getElementById(id);
+
+
+
+for(let i=0;i<7;i++){
+
+
+
+let date=new Date(start);
+
+date.setDate(
+    start.getDate()+i
+);
+
+
+
+
+let card=document.createElement("div");
+
+
+card.className="day";
+
+
+
+
+
+if(isCurrent && i<currentDay){
+
+card.classList.add("past");
 
 }
 
-function createWeek(container,startDate,isCurrentWeek){
 
-    const div=document.getElementById(container);
 
-    for(let i=0;i<7;i++){
 
-        const d=new Date(startDate);
 
-        d.setDate(startDate.getDate()+i);
+card.innerHTML=`
 
-        const card=document.createElement("div");
+<h3>${dayNames[i]}</h3>
 
-        card.className="day";
+<p>
+${date.getDate()}/${date.getMonth()+1}
+</p>
 
-        if(isCurrentWeek && i<currentDay){
 
-            card.classList.add("past");
+<div class="day-actions">
 
-        }
 
-        card.innerHTML=
-        `
-        <h3>${dayNames[i]}</h3>
-        <p>${d.getDate()}/${d.getMonth()+1}</p>
-        <div class="day-actions">
-            <button type="button" class="day-btn view-btn">משימות</button>
-            ${isAdmin && !isPastDay(d) ? '<button type="button" class="day-btn edit-btn">עריכה</button>' : ""}
-        </div>
-        `;
+<button class="view">
+משימות
+</button>
 
-        const viewBtn = card.querySelector(".view-btn");
 
-        viewBtn.addEventListener("click", (e)=>{
-            e.stopPropagation();
-            openTaskModal(d,false);
-        });
+${
+isAdmin && !isPast(date)
+?
+`
+<button class="edit">
+הוסף משימה
+</button>
+`
+:
+""
+}
 
-        const editBtn = card.querySelector(".edit-btn");
 
-        if(editBtn){
+</div>
 
-            editBtn.addEventListener("click", (e)=>{
-                e.stopPropagation();
-                openTaskModal(d,true);
-            });
 
-        }
+`;
 
-        div.appendChild(card);
 
-    }
+
+
+
+
+
+card.querySelector(".view")
+.onclick=()=>{
+
+openView(date);
+
+};
+
+
+
+
+
+
+
+let edit=card.querySelector(".edit");
+
+
+if(edit){
+
+
+edit.onclick=()=>{
+
+openEdit(date);
+
+};
+
 
 }
+
+
+
+
+
+container.appendChild(card);
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
 
 function buildCalendar(){
 
-    // Clear in case this ever gets called more than once
-    document.getElementById("thisWeek").innerHTML = "";
-    document.getElementById("nextWeek").innerHTML = "";
 
-    createWeek("thisWeek",sunday,true);
+document.getElementById("thisWeek").innerHTML="";
 
-    const nextSunday=new Date(sunday);
+document.getElementById("nextWeek").innerHTML="";
 
-    nextSunday.setDate(sunday.getDate()+7);
 
-    createWeek("nextWeek",nextSunday,false);
+
+createWeek(
+"thisWeek",
+sunday,
+true
+);
+
+
+
+
+let next=new Date(sunday);
+
+next.setDate(
+    sunday.getDate()+7
+);
+
+
+
+createWeek(
+"nextWeek",
+next,
+false
+);
+
+
 
 }
 
 
-// Username + admin check, then build the calendar
+
+
+
+
+
+
+
 fetch("/user")
+
 .then(r=>r.json())
+
 .then(data=>{
 
-    document.getElementById("username").textContent="שלום " + data.username;
 
-    isAdmin = !!data.isAdmin;
+document.getElementById("username")
+.textContent=
+"שלום "+data.username;
 
-    buildCalendar();
+
+
+isAdmin=data.isAdmin;
+
+
+
+buildCalendar();
+
+
 
 });
+
+
+
+
+
+
+
+
+
+
 
 
 // ============================
-// Task Popup
+// View assignments
 // ============================
 
-const taskModal = document.getElementById("taskModal");
-const modalDate = document.getElementById("modalDate");
-const modalBody = document.getElementById("modalBody");
-const modalClose = document.getElementById("modalClose");
 
-async function openTaskModal(date, editMode){
 
-    const label = `${dayNames[date.getDay()]} ${date.getDate()}/${date.getMonth()+1}`;
-    const isoDate = toISODate(date);
+async function openView(date){
 
-    modalDate.textContent = label;
-    modalBody.innerHTML = `<div class="modal-empty">טוען...</div>`;
-    taskModal.classList.add("active");
 
-    // Load whatever is currently saved for this date
-    let content = "";
+selectedDate=date;
 
-    try{
 
-        const res = await fetch(`/api/daynotes/${isoDate}`);
+let iso=formatDate(date);
 
-        if(res.ok){
-            const data = await res.json();
-            content = data.content || "";
-        }
 
-    }catch(err){
 
-        console.log("Failed to load day note", err);
+openModal(
+`${dayNames[date.getDay()]} ${date.getDate()}/${date.getMonth()+1}`
+);
 
-    }
 
-    if(editMode){
 
-        modalBody.innerHTML =
-            `<textarea id="modalEditArea" class="modal-edit-area" placeholder="כתוב כאן משימות..."></textarea>
-            <button type="button" class="modal-save-btn" id="modalSaveBtn">שמור</button>`;
 
-        document.getElementById("modalEditArea").value = content;
+let res=
+await fetch(
+`/api/assignments?date=${iso}`
+);
 
-        document.getElementById("modalSaveBtn").addEventListener("click", async ()=>{
 
-            const newText = document.getElementById("modalEditArea").value.trim();
 
-            try{
+let data=
+await res.json();
 
-                await fetch(`/api/daynotes/${isoDate}`, {
-                    method:"PUT",
-                    headers:{"Content-Type":"application/json"},
-                    body: JSON.stringify({content:newText})
-                });
 
-            }catch(err){
 
-                console.log("Failed to save day note", err);
 
-            }
 
-            renderNoteView(newText);
+let html="";
 
-        });
 
-    } else {
 
-        renderNoteView(content);
 
-    }
+
+if(data.length===0){
+
+
+html=
+`
+<p>
+אין משימות
+</p>
+`;
+
+
 
 }
+else{
 
-function renderNoteView(content){
 
-    modalBody.innerHTML = content
-        ? `<div class="modal-text"></div>`
-        : `<div class="modal-empty">אין עדיין משימות</div>`;
 
-    if(content){
-        modalBody.querySelector(".modal-text").textContent = content;
-    }
+data.forEach(a=>{
 
+
+html+=`
+
+<div class="assignment">
+
+<b>${a.taskType}</b>
+
+<br>
+
+${a.assignedUser}
+
+<br>
+
+${a.startTime}
+-
+${a.endTime}
+
+
+${isAdmin ?
+`
+<br>
+<button onclick="deleteAssignment('${a._id}')">
+מחיקה
+</button>
+`
+:
+""
 }
 
-function closeTaskModal(){
 
-    taskModal.classList.remove("active");
+</div>
 
-}
 
-modalClose.addEventListener("click", closeTaskModal);
+`;
 
-taskModal.addEventListener("click", (e)=>{
-    if(e.target === taskModal){
-        closeTaskModal();
-    }
+
+
 });
 
-document.addEventListener("keydown", (e)=>{
-    if(e.key === "Escape" && taskModal.classList.contains("active")){
-        closeTaskModal();
-    }
+
+
+}
+
+
+
+document.getElementById("modalBody")
+.innerHTML=html;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ============================
+// Admin create assignment
+// ============================
+
+
+async function openEdit(date){
+
+
+selectedDate=date;
+
+
+openModal("יצירת משימה");
+
+
+
+document.getElementById("modalBody")
+.innerHTML=`
+
+<h3>
+בחר סוג משימה
+</h3>
+
+
+<button onclick="chooseType('Kitchen')">
+מטבח
+</button>
+
+
+<button onclick="chooseType('Guarding')">
+שמירה
+</button>
+
+
+`;
+
+
+
+}
+
+
+
+
+
+
+
+
+async function chooseType(type){
+
+
+document.getElementById("modalBody")
+.innerHTML="טוען משתמשים...";
+
+
+
+let res=
+await fetch("/api/users");
+
+
+let users=
+await res.json();
+
+
+
+
+let html=`
+
+<h3>
+בחר משתמש
+</h3>
+
+`;
+
+
+
+users.forEach(u=>{
+
+
+html+=`
+
+<button onclick="chooseUser('${type}','${u.username}')">
+
+${u.username}
+
+</button>
+
+`;
+
+
+
 });
+
+
+
+document.getElementById("modalBody")
+.innerHTML=html;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+function chooseUser(type,user){
+
+
+
+document.getElementById("modalBody")
+.innerHTML=`
+
+<h3>
+${type}
+- ${user}
+</h3>
+
+
+
+<label>
+משעה:
+</label>
+
+
+<input id="start" type="time">
+
+
+
+<br>
+
+
+<label>
+עד שעה:
+</label>
+
+
+<input id="end" type="time">
+
+
+
+<br><br>
+
+
+<button onclick="saveAssignment('${type}','${user}')">
+
+שמירה
+
+</button>
+
+
+`;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+async function saveAssignment(type,user){
+
+
+let body={
+
+
+assignedUser:user,
+
+
+taskType:type,
+
+
+date:formatDate(selectedDate),
+
+
+startTime:
+document.getElementById("start").value,
+
+
+endTime:
+document.getElementById("end").value
+
+
+
+};
+
+
+
+await fetch("/api/assignments",{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:
+JSON.stringify(body)
+
+
+});
+
+
+
+closeModal();
+
+
+alert("נשמר בהצלחה");
+
+
+}
+
+
+
+
+
+
+
+
+
+async function deleteAssignment(id){
+
+
+await fetch(
+`/api/assignments/${id}`,
+{
+
+method:"DELETE"
+
+}
+
+);
+
+
+closeModal();
+
+
+openView(selectedDate);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// ============================
+// Modal
+// ============================
+
+
+function openModal(title){
+
+
+document.getElementById("modalTitle")
+.textContent=title;
+
+
+document.getElementById("modal")
+.classList.add("active");
+
+
+}
+
+
+
+function closeModal(){
+
+
+document.getElementById("modal")
+.classList.remove("active");
+
+
+}
+
+
+
+document.getElementById("close")
+.onclick=closeModal;
+
+
+
+document.getElementById("modal")
+.onclick=e=>{
+
+
+if(e.target.id==="modal"){
+
+closeModal();
+
+}
+
+
+};
+
+
+
 
 </script>
+
 
 </body>
 
