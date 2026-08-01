@@ -1,123 +1,402 @@
 *{
 
     margin:0;
+
     padding:0;
+
     box-sizing:border-box;
+
     font-family:Arial, Helvetica, sans-serif;
 
 }
 
 
 
+
 body{
+
 
     background:#f4f4f4;
 
+
     min-height:100vh;
 
+
+    transition:.3s;
+
+
 }
+
+
+
+
+
 
 
 
 /* ============================
-   Header
+   DARK MODE
 ============================ */
+
+
+body.dark{
+
+
+    background:#181818;
+
+
+    color:white;
+
+
+}
+
+
+
+
+
+body.dark .header{
+
+
+    background:#242424;
+
+
+}
+
+
+
+
+
+body.dark .day{
+
+
+    background:#242424;
+
+
+    color:white;
+
+
+}
+
+
+
+
+
+body.dark .day p{
+
+
+    color:#ddd;
+
+
+}
+
+
+
+
+
+body.dark .modal-box{
+
+
+    background:#242424;
+
+
+    color:white;
+
+
+}
+
+
+
+
+
+
+
+
+body.dark .assignment{
+
+
+    background:#333;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* ============================
+   HEADER
+============================ */
+
 
 
 .header{
 
+
     width:100%;
 
-    height:70px;
+
+    height:75px;
+
 
     background:white;
 
+
     display:flex;
 
-    justify-content:space-between;
 
     align-items:center;
 
-    padding:0 30px;
 
-    box-shadow:0 2px 10px rgba(0,0,0,.1);
+    justify-content:space-between;
+
+
+    padding:0 35px;
+
+
+    box-shadow:0 4px 15px rgba(0,0,0,.12);
+
+
+    position:relative;
+
 
 }
 
 
 
-.header button,
-.back button{
 
-    padding:10px 18px;
+
+/*
+LEFT:
+Exit button
+*/
+
+
+
+.logout-area{
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+}
+
+
+
+
+
+
+
+.logout-btn{
+
+
+    padding:12px 28px;
+
 
     border:none;
 
-    border-radius:5px;
 
-    background:#007BFF;
+    border-radius:30px;
+
+
+    background:#dc3545;
+
 
     color:white;
 
+
+    font-size:16px;
+
+
     cursor:pointer;
 
+
+    transition:.25s;
+
+
 }
 
 
 
-.header button:hover,
-.back button:hover{
 
-    background:#005ec2;
+
+.logout-btn:hover{
+
+
+    background:#a71d2a;
+
+
+    transform:scale(1.05);
+
 
 }
+
+
+
+
+
+
+
+
+/*
+CENTER:
+Username
+*/
 
 
 
 .username{
 
-    font-size:20px;
+
+    position:absolute;
+
+
+    left:50%;
+
+
+    transform:translateX(-50%);
+
+
+    font-size:23px;
+
 
     font-weight:bold;
 
+
 }
+
+
+
+
+
+/*
+RIGHT:
+Theme switch
+*/
+
+
+
+.theme-area{
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+}
+
+
+
+
+
+
+#themeToggle{
+
+
+    width:55px;
+
+
+    height:35px;
+
+
+    border:none;
+
+
+    border-radius:25px;
+
+
+    background:#333;
+
+
+    color:white;
+
+
+    font-size:18px;
+
+
+    cursor:pointer;
+
+
+    transition:.3s;
+
+
+}
+
+
+
+
+
+#themeToggle:hover{
+
+
+    transform:scale(1.1);
+
+
+}
+
+
+
+
 
 
 
 
 
 /* ============================
-   Calendar
+   CALENDAR
 ============================ */
 
 
 .calendar-container{
 
+
     width:95%;
+
 
     max-width:1200px;
 
+
     margin:40px auto;
 
+
 }
+
+
 
 
 
 .week{
 
+
     margin-bottom:50px;
 
+
 }
+
+
 
 
 
 .week h2{
 
+
     margin-bottom:20px;
+
 
     text-align:center;
 
+
 }
+
+
 
 
 
@@ -125,15 +404,22 @@ body{
 
 .days{
 
+
     display:grid;
+
 
     grid-template-columns:repeat(7,1fr);
 
+
     gap:20px;
+
 
     direction:rtl;
 
+
 }
+
+
 
 
 
@@ -142,9 +428,12 @@ body{
 
 .day{
 
+
     background:white;
 
+
     border-radius:10px;
+
 
     min-height:160px;
 
@@ -154,9 +443,12 @@ body{
 
     display:flex;
 
+
     flex-direction:column;
 
+
     justify-content:flex-start;
+
 
     align-items:center;
 
@@ -166,59 +458,55 @@ body{
 
     transition:.2s;
 
+
 }
+
+
+
 
 
 
 .day:hover{
 
+
     transform:translateY(-4px);
 
+
 }
+
+
+
+
 
 
 
 .day h3{
 
+
     margin-bottom:15px;
 
+
 }
+
+
 
 
 
 .day p{
 
+
     font-size:20px;
+
 
     font-weight:bold;
 
+
     color:#555;
 
-}
-
-
-
-
-
-/* Past days */
-
-
-.day.past,
-.past{
-
-    background:#cfcfcf;
-
-    color:#666;
 
 }
 
 
-
-.day.past p{
-
-    color:#777;
-
-}
 
 
 
@@ -227,39 +515,207 @@ body{
 
 
 /* ============================
-   Day Buttons
+   TASK DOTS
+============================ */
+
+
+.task-dots{
+
+
+    display:flex;
+
+
+    gap:7px;
+
+
+    margin-top:10px;
+
+
+    height:15px;
+
+
+    align-items:center;
+
+
+}
+
+
+
+
+
+
+
+.task-dots span{
+
+
+    width:13px;
+
+
+    height:13px;
+
+
+    border-radius:50%;
+
+
+    display:inline-block;
+
+
+}
+
+
+
+
+
+
+
+/* שמירה */
+
+
+.guard-dot{
+
+
+    background:#7b2cbf;
+
+
+}
+
+
+
+
+
+
+
+/* מטבח */
+
+
+.kitchen-dot{
+
+
+    background:#e63946;
+
+
+}
+
+
+
+
+
+
+
+/* אחר */
+
+
+.other-dot{
+
+
+    background:#2196f3;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* ============================
+   Past Days
+============================ */
+
+
+.day.past,
+.past{
+
+
+    background:#cfcfcf;
+
+
+    color:#666;
+
+
+}
+
+
+
+
+
+.day.past p{
+
+
+    color:#777;
+
+
+}
+
+
+
+
+
+
+
+body.dark .day.past{
+
+
+    background:#444;
+
+
+    color:#aaa;
+
+
+}
+
+/* ============================
+   DAY BUTTONS
 ============================ */
 
 
 .day-actions{
 
+
     display:flex;
+
 
     gap:8px;
 
+
     margin-top:20px;
+
 
     opacity:0;
 
+
     transform:translateY(6px);
+
 
     pointer-events:none;
 
+
     transition:.2s;
 
+
 }
+
+
 
 
 
 .day:hover .day-actions{
 
+
     opacity:1;
+
 
     transform:translateY(0);
 
+
     pointer-events:auto;
 
+
 }
+
 
 
 
@@ -268,46 +724,70 @@ body{
 .day-actions button,
 .day-btn{
 
+
     border:none;
+
 
     border-radius:6px;
 
+
     padding:7px 12px;
+
 
     font-size:13px;
 
+
     cursor:pointer;
+
 
     background:#007BFF;
 
+
     color:white;
 
+
 }
+
+
+
+
 
 
 
 .day-actions button:hover,
 .day-btn:hover{
 
+
     background:#005ec2;
 
+
 }
+
+
+
+
 
 
 
 .edit,
 .edit-btn{
 
+
     background:#28a745 !important;
 
+
 }
+
+
 
 
 
 .edit:hover,
 .edit-btn:hover{
 
+
     background:#1e7e34 !important;
+
 
 }
 
@@ -320,35 +800,50 @@ body{
 
 
 /* ============================
-   Modal
+   MODALS
 ============================ */
 
 
 .modal-overlay{
 
+
     display:none;
+
 
     position:fixed;
 
+
     inset:0;
+
 
     background:rgba(0,0,0,.45);
 
+
     justify-content:center;
+
 
     align-items:center;
 
+
     z-index:100;
 
+
 }
+
+
 
 
 
 .modal-overlay.active{
 
+
     display:flex;
 
+
 }
+
+
+
 
 
 
@@ -356,26 +851,38 @@ body{
 
 .modal-box{
 
+
     background:white;
+
 
     width:90%;
 
+
     max-width:420px;
+
 
     max-height:80vh;
 
+
     overflow-y:auto;
+
 
     border-radius:12px;
 
+
     box-shadow:0 10px 30px rgba(0,0,0,.25);
+
 
     padding:25px;
 
 
     animation:modalAppear .2s ease;
 
+
 }
+
+
+
 
 
 
@@ -383,24 +890,36 @@ body{
 
 @keyframes modalAppear{
 
+
     from{
+
 
         opacity:0;
 
+
         transform:translateY(15px);
 
+
     }
+
 
 
     to{
 
+
         opacity:1;
+
 
         transform:translateY(0);
 
+
     }
 
+
 }
+
+
+
 
 
 
@@ -408,49 +927,72 @@ body{
 
 .modal-header{
 
+
     display:flex;
+
 
     justify-content:space-between;
 
+
     align-items:center;
+
 
     margin-bottom:15px;
 
+
 }
+
+
+
 
 
 
 .modal-header h3{
 
+
     font-size:20px;
+
 
 }
 
 
 
-.modal-header button,
-.modal-close{
+
+
+
+.modal-header button{
+
 
     background:none;
 
+
     border:none;
+
 
     font-size:28px;
 
+
     cursor:pointer;
+
 
     color:#888;
 
+
 }
 
 
 
-.modal-header button:hover,
-.modal-close:hover{
+
+
+.modal-header button:hover{
+
 
     color:#333;
 
+
 }
+
+
 
 
 
@@ -459,55 +1001,83 @@ body{
 
 
 /* ============================
-   Popup Inputs + Buttons
+   INPUTS AND BUTTONS
 ============================ */
 
 
-#modalBody button{
+#modalBody button,
+.confirm-buttons button{
+
 
     width:100%;
 
+
     padding:12px;
+
 
     margin:8px 0;
 
+
     background:#007BFF;
+
 
     color:white;
 
+
     border:none;
+
 
     border-radius:6px;
 
+
     cursor:pointer;
+
 
     font-size:16px;
 
+
 }
 
 
 
-#modalBody button:hover{
+
+
+#modalBody button:hover,
+.confirm-buttons button:hover{
+
 
     background:#005ec2;
 
+
 }
+
+
+
+
 
 
 
 #modalBody input{
 
+
     width:100%;
+
 
     padding:10px;
 
+
     margin:8px 0;
 
-    border:1px solid #ccc;
+
+    border:1px solid:#ccc;
+
 
     border-radius:5px;
 
+
 }
+
+
 
 
 
@@ -516,33 +1086,155 @@ body{
 
 
 /* ============================
-   Assignment Cards
+   CONFIRMATION POPUP
+============================ */
+
+
+#confirmText{
+
+
+    text-align:center;
+
+
+    font-size:18px;
+
+
+    line-height:1.6;
+
+
+    margin-bottom:20px;
+
+
+}
+
+
+
+
+
+
+
+.confirm-buttons{
+
+
+    display:flex;
+
+
+    gap:15px;
+
+
+}
+
+
+
+
+
+.confirm-buttons button{
+
+
+    flex:1;
+
+
+}
+
+
+
+
+
+#confirmYes{
+
+
+    background:#28a745 !important;
+
+
+}
+
+
+
+
+
+#confirmYes:hover{
+
+
+    background:#1e7e34 !important;
+
+
+}
+
+
+
+
+
+#confirmNo{
+
+
+    background:#dc3545 !important;
+
+
+}
+
+
+
+
+
+#confirmNo:hover{
+
+
+    background:#a71d2a !important;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* ============================
+   ASSIGNMENT CARDS
 ============================ */
 
 
 .assignment{
 
+
     background:#eeeeee;
+
 
     border-left:5px solid #007BFF;
 
+
     padding:12px;
+
 
     margin:10px 0;
 
+
     border-radius:5px;
+
 
     text-align:center;
 
+
 }
+
+
+
+
 
 
 
 .assignment b{
 
+
     font-size:18px;
 
+
 }
+
+
 
 
 
@@ -550,15 +1242,21 @@ body{
 
 .assignment button{
 
+
     background:#dc3545 !important;
 
+
 }
+
+
 
 
 
 .assignment button:hover{
 
+
     background:#a71d2a !important;
+
 
 }
 
@@ -569,30 +1267,103 @@ body{
 
 
 
+
 /* ============================
-   Empty / Text
+   EMPTY TEXT
 ============================ */
 
 
 .modal-empty{
 
+
     color:#999;
+
 
     text-align:center;
 
+
     padding:30px 0;
+
 
 }
 
 
 
-.modal-text{
 
-    white-space:pre-wrap;
 
-    color:#333;
 
-    line-height:1.5;
+
+
+/* ============================
+   DARK MODE FIXES
+============================ */
+
+
+body.dark .modal-header button{
+
+
+    color:#ddd;
+
+
+}
+
+
+
+
+
+body.dark .modal-header button:hover{
+
+
+    color:white;
+
+
+}
+
+
+
+
+
+
+body.dark #modalBody input{
+
+
+    background:#333;
+
+
+    color:white;
+
+
+    border-color:#555;
+
+
+}
+
+
+
+
+
+
+body.dark .modal-empty{
+
+
+    color:#aaa;
+
+
+}
+
+
+
+
+
+
+body.dark #themeToggle{
+
+
+    background:#eee;
+
+
+    color:#222;
+
 
 }
 
@@ -605,7 +1376,7 @@ body{
 
 
 /* ============================
-   Responsive
+   RESPONSIVE
 ============================ */
 
 
@@ -614,12 +1385,19 @@ body{
 
     .days{
 
+
         grid-template-columns:repeat(2,1fr);
+
 
     }
 
 
+
 }
+
+
+
+
 
 
 
@@ -628,23 +1406,81 @@ body{
 
     .days{
 
+
         grid-template-columns:1fr;
 
+
     }
+
+
+
+
 
 
     .calendar-container{
 
+
         width:90%;
 
+
     }
+
+
+
+
 
 
     .modal-box{
 
+
         width:90%;
 
+
     }
+
+
+
+
+
+
+    .header{
+
+
+        padding:0 15px;
+
+
+    }
+
+
+
+
+
+
+    .username{
+
+
+        font-size:17px;
+
+
+    }
+
+
+
+
+
+
+    .logout-btn{
+
+
+        padding:10px 18px;
+
+
+        font-size:14px;
+
+
+    }
+
+
 
 
 }

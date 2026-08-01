@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="he" dir="rtl">
 
 <head>
 
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Calendar</title>
@@ -19,20 +20,49 @@
 <header class="header">
 
 
-<div class="back">
-
-<button onclick="window.location.href='/choice'">
-← חזרה
-</button>
-
-</div>
+    <!-- LEFT SIDE -->
+    <div class="logout-area">
 
 
-<div class="username">
+        <button class="logout-btn" onclick="window.location.href='/choice'">
 
-<span id="username"></span>
+        יציאה
 
-</div>
+        </button>
+
+
+    </div>
+
+
+
+
+
+    <!-- CENTER -->
+    <div class="username">
+
+
+        <span id="username"></span>
+
+
+    </div>
+
+
+
+
+
+    <!-- RIGHT SIDE -->
+    <div class="theme-area">
+
+
+        <button id="themeToggle">
+
+            🌙
+
+        </button>
+
+
+    </div>
+
 
 
 </header>
@@ -41,26 +71,55 @@
 
 
 
+
+
+
+
 <div class="calendar-container">
 
 
+
 <div class="week">
 
-<h2>השבוע</h2>
+
+<h2>
+
+השבוע
+
+</h2>
+
+
 
 <div class="days" id="thisWeek"></div>
 
+
+
 </div>
+
+
+
+
 
 
 
 <div class="week">
 
-<h2>השבוע הבא</h2>
+
+<h2>
+
+השבוע הבא
+
+</h2>
+
+
 
 <div class="days" id="nextWeek"></div>
 
+
+
 </div>
+
+
 
 
 </div>
@@ -79,16 +138,22 @@
 <div class="modal-overlay" id="modal">
 
 
+
 <div class="modal-box">
+
 
 
 <div class="modal-header">
 
+
 <h3 id="modalTitle"></h3>
 
 
+
 <button id="close">
+
 ×
+
 </button>
 
 
@@ -96,10 +161,89 @@
 
 
 
+
+
 <div id="modalBody">
 
 
 </div>
+
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- Confirmation Popup -->
+
+
+<div class="modal-overlay" id="confirmModal">
+
+
+
+<div class="modal-box">
+
+
+
+<div class="modal-header">
+
+
+<h3>
+
+אישור
+
+</h3>
+
+
+</div>
+
+
+
+
+
+<div id="confirmText">
+
+
+</div>
+
+
+
+
+
+
+<div class="confirm-buttons">
+
+
+
+<button id="confirmYes">
+
+כן
+
+</button>
+
+
+
+
+<button id="confirmNo">
+
+לא
+
+</button>
+
+
+
+</div>
+
 
 
 
@@ -121,35 +265,63 @@
 
 let isAdmin=false;
 
+
 let selectedDate=null;
+
+
+let pendingAssignment=null;
+
+
+
 
 
 
 const dayNames=[
 
+
 "ראשון",
+
 "שני",
+
 "שלישי",
+
 "רביעי",
+
 "חמישי",
+
 "שישי",
+
 "שבת"
+
 
 ];
 
 
 
+
+
+
 const today=new Date();
+
 
 const currentDay=today.getDay();
 
 
 
+
+
 const sunday=new Date(today);
 
+
+
 sunday.setDate(
+
     today.getDate()-currentDay
+
 );
+
+
+
 
 
 
@@ -161,14 +333,18 @@ function formatDate(date){
 
 let y=date.getFullYear();
 
+
+
 let m=String(
     date.getMonth()+1
 ).padStart(2,"0");
 
 
+
 let d=String(
     date.getDate()
 ).padStart(2,"0");
+
 
 
 return `${y}-${m}-${d}`;
@@ -183,21 +359,35 @@ return `${y}-${m}-${d}`;
 
 
 
+
 function isPast(date){
 
 
 let now=new Date();
 
-now.setHours(0,0,0,0);
+
+now.setHours(
+    0,
+    0,
+    0,
+    0
+);
+
 
 
 let check=new Date(date);
 
-check.setHours(0,0,0,0);
+
+check.setHours(
+    0,
+    0,
+    0,
+    0
+);
 
 
 
-return check<now;
+return check < now;
 
 
 }
@@ -210,11 +400,148 @@ return check<now;
 
 
 
-function createWeek(id,start,isCurrent){
+let calendarDots={};
 
 
-const container=
+
+
+
+
+
+async function loadCalendarDots(){
+
+
+let res =
+await fetch("/api/calendar-dots");
+
+
+
+calendarDots =
+await res.json();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function createDots(date){
+
+
+
+let iso =
+formatDate(date);
+
+
+
+
+let tasks =
+calendarDots[iso];
+
+
+
+
+
+if(!tasks || tasks.length===0){
+
+
+return "";
+
+
+}
+
+
+
+
+let html=
+`<div class="task-dots">`;
+
+
+
+
+
+tasks.forEach(task=>{
+
+
+
+let colorClass="";
+
+
+
+if(task.type==="Guarding"){
+
+
+colorClass="guard-dot";
+
+
+}
+else if(task.type==="Kitchen"){
+
+
+colorClass="kitchen-dot";
+
+
+}
+else{
+
+
+colorClass="other-dot";
+
+
+}
+
+
+
+
+html+=`
+
+<span class="${colorClass}"></span>
+
+`;
+
+
+
+});
+
+
+
+
+html+=`</div>`;
+
+
+
+
+return html;
+
+
+}
+
+
+
+
+
+
+// ============================
+// Create Week
+// ============================
+
+function createWeek(
+    id,
+    start,
+    isCurrent
+){
+
+
+
+const container =
 document.getElementById(id);
+
 
 
 
@@ -222,7 +549,10 @@ for(let i=0;i<7;i++){
 
 
 
-let date=new Date(start);
+let date =
+new Date(start);
+
+
 
 date.setDate(
     start.getDate()+i
@@ -231,7 +561,10 @@ date.setDate(
 
 
 
-let card=document.createElement("div");
+
+let card =
+document.createElement("div");
+
 
 
 card.className="day";
@@ -240,9 +573,12 @@ card.className="day";
 
 
 
+
 if(isCurrent && i<currentDay){
 
+
 card.classList.add("past");
+
 
 }
 
@@ -252,32 +588,60 @@ card.classList.add("past");
 
 card.innerHTML=`
 
-<h3>${dayNames[i]}</h3>
+<h3>
+
+${dayNames[i]}
+
+</h3>
+
+
 
 <p>
+
 ${date.getDate()}/${date.getMonth()+1}
+
 </p>
+
+
+
+${createDots(date)}
+
+
 
 
 <div class="day-actions">
 
 
 <button class="view">
+
 משימות
+
 </button>
+
+
 
 
 ${
 isAdmin && !isPast(date)
+
 ?
+
 `
+
 <button class="edit">
+
 הוסף משימה
+
 </button>
+
 `
+
 :
+
 ""
+
 }
+
 
 
 </div>
@@ -294,7 +658,9 @@ isAdmin && !isPast(date)
 card.querySelector(".view")
 .onclick=()=>{
 
+
 openView(date);
+
 
 };
 
@@ -302,9 +668,9 @@ openView(date);
 
 
 
+let edit =
+card.querySelector(".edit");
 
-
-let edit=card.querySelector(".edit");
 
 
 if(edit){
@@ -312,7 +678,9 @@ if(edit){
 
 edit.onclick=()=>{
 
+
 openEdit(date);
+
 
 };
 
@@ -321,18 +689,14 @@ openEdit(date);
 
 
 
-
-
 container.appendChild(card);
 
 
-}
-
-
 
 }
 
 
+}
 
 
 
@@ -341,25 +705,50 @@ container.appendChild(card);
 
 
 
-function buildCalendar(){
+
+// ============================
+// Build Calendar
+// ============================
+
+async function buildCalendar(){
 
 
-document.getElementById("thisWeek").innerHTML="";
 
-document.getElementById("nextWeek").innerHTML="";
+await loadCalendarDots();
+
+
+
+
+document.getElementById("thisWeek")
+.innerHTML="";
+
+
+
+document.getElementById("nextWeek")
+.innerHTML="";
+
+
 
 
 
 createWeek(
+
 "thisWeek",
+
 sunday,
+
 true
+
 );
 
 
 
 
-let next=new Date(sunday);
+
+let next =
+new Date(sunday);
+
+
 
 next.setDate(
     sunday.getDate()+7
@@ -367,10 +756,16 @@ next.setDate(
 
 
 
+
+
 createWeek(
+
 "nextWeek",
+
 next,
+
 false
+
 );
 
 
@@ -384,6 +779,10 @@ false
 
 
 
+
+// ============================
+// Load User
+// ============================
 
 fetch("/user")
 
@@ -393,12 +792,13 @@ fetch("/user")
 
 
 document.getElementById("username")
-.textContent=
-"שלום "+data.username;
+.textContent =
+"שלום " + data.username;
 
 
 
-isAdmin=data.isAdmin;
+isAdmin =
+data.isAdmin;
 
 
 
@@ -416,40 +816,47 @@ buildCalendar();
 
 
 
-
-
-
 // ============================
-// View assignments
+// View Assignments
 // ============================
-
-
 
 async function openView(date){
+
 
 
 selectedDate=date;
 
 
-let iso=formatDate(date);
+
+
+let iso =
+formatDate(date);
+
+
 
 
 
 openModal(
+
 `${dayNames[date.getDay()]} ${date.getDate()}/${date.getMonth()+1}`
+
 );
 
 
 
 
-let res=
+
+
+let res =
 await fetch(
+
 `/api/assignments?date=${iso}`
+
 );
 
 
 
-let data=
+let data =
 await res.json();
 
 
@@ -465,16 +872,21 @@ let html="";
 if(data.length===0){
 
 
-html=
-`
-<p>
+
+html=`
+
+<p class="modal-empty">
+
 אין משימות
+
 </p>
+
 `;
 
 
 
 }
+
 else{
 
 
@@ -482,37 +894,85 @@ else{
 data.forEach(a=>{
 
 
+
+let taskName =
+a.taskType==="Other"
+?
+a.customName
+:
+(
+a.taskType==="Kitchen"
+?
+"מטבח"
+:
+"שמירה"
+);
+
+
+
+
+
+
 html+=`
 
 <div class="assignment">
 
-<b>${a.taskType}</b>
+
+<b>
+
+${taskName}
+
+</b>
+
+
 
 <br>
+
+
 
 ${a.assignedUser}
 
+
+
 <br>
 
+
+
 ${a.startTime}
+
 -
+
 ${a.endTime}
 
 
-${isAdmin ?
+
+
+${
+isAdmin
+
+?
+
 `
+
 <br>
+
 <button onclick="deleteAssignment('${a._id}')">
+
 מחיקה
+
 </button>
+
 `
+
 :
+
 ""
+
 }
 
 
-</div>
 
+</div>
 
 `;
 
@@ -526,8 +986,10 @@ ${isAdmin ?
 
 
 
+
 document.getElementById("modalBody")
-.innerHTML=html;
+.innerHTML =
+html;
 
 
 
@@ -542,17 +1004,20 @@ document.getElementById("modalBody")
 
 
 // ============================
-// Admin create assignment
+// Create Assignment
 // ============================
 
-
 async function openEdit(date){
+
 
 
 selectedDate=date;
 
 
+
 openModal("יצירת משימה");
+
+
 
 
 
@@ -560,25 +1025,43 @@ document.getElementById("modalBody")
 .innerHTML=`
 
 <h3>
+
 בחר סוג משימה
+
 </h3>
 
 
+
 <button onclick="chooseType('Kitchen')">
+
 מטבח
+
 </button>
+
+
 
 
 <button onclick="chooseType('Guarding')">
+
 שמירה
+
 </button>
 
+
+
+
+<button onclick="chooseType('Other')">
+
+אחר
+
+</button>
 
 `;
 
 
 
 }
+
 
 
 
@@ -590,17 +1073,122 @@ document.getElementById("modalBody")
 async function chooseType(type){
 
 
+
+if(type==="Other"){
+
+
+
 document.getElementById("modalBody")
-.innerHTML="טוען משתמשים...";
+.innerHTML=`
+
+<h3>
+
+שם המשימה
+
+</h3>
 
 
 
-let res=
+<input id="otherName" placeholder="שם המשימה">
+
+
+<button onclick="chooseOtherName()">
+
+המשך
+
+</button>
+
+`;
+
+
+
+return;
+
+
+}
+
+
+
+showUsers(type);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function chooseOtherName(){
+
+
+
+let name =
+document.getElementById("otherName")
+.value
+.trim();
+
+
+
+
+
+if(!name){
+
+
+alert("יש להכניס שם משימה");
+
+
+return;
+
+
+}
+
+
+
+showUsers(
+"Other",
+name
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+async function showUsers(
+type,
+customName=""
+){
+
+
+
+document.getElementById("modalBody")
+.innerHTML=
+"טוען משתמשים...";
+
+
+
+
+
+let res =
 await fetch("/api/users");
 
 
-let users=
+
+let users =
 await res.json();
+
 
 
 
@@ -608,10 +1196,14 @@ await res.json();
 let html=`
 
 <h3>
+
 בחר משתמש
+
 </h3>
 
 `;
+
+
 
 
 
@@ -620,7 +1212,7 @@ users.forEach(u=>{
 
 html+=`
 
-<button onclick="chooseUser('${type}','${u.username}')">
+<button onclick="chooseUser('${type}','${u.username}','${customName}')">
 
 ${u.username}
 
@@ -634,8 +1226,11 @@ ${u.username}
 
 
 
+
+
 document.getElementById("modalBody")
-.innerHTML=html;
+.innerHTML=
+html;
 
 
 
@@ -649,8 +1244,11 @@ document.getElementById("modalBody")
 
 
 
-
-function chooseUser(type,user){
+function chooseUser(
+type,
+user,
+customName=""
+){
 
 
 
@@ -658,14 +1256,21 @@ document.getElementById("modalBody")
 .innerHTML=`
 
 <h3>
-${type}
-- ${user}
+
+${user}
+
+-
+
+${type==="Other" ? customName : type}
+
 </h3>
 
 
 
 <label>
+
 משעה:
+
 </label>
 
 
@@ -676,8 +1281,11 @@ ${type}
 <br>
 
 
+
 <label>
+
 עד שעה:
+
 </label>
 
 
@@ -688,12 +1296,12 @@ ${type}
 <br><br>
 
 
-<button onclick="saveAssignment('${type}','${user}')">
+
+<button onclick="saveAssignment('${type}','${user}','${customName}')">
 
 שמירה
 
 </button>
-
 
 `;
 
@@ -709,24 +1317,37 @@ ${type}
 
 
 
+async function saveAssignment(
+type,
+user,
+customName=""
+){
 
-async function saveAssignment(type,user){
 
 
 let body={
 
 
+
 assignedUser:user,
+
 
 
 taskType:type,
 
 
+
+customName:customName,
+
+
+
 date:formatDate(selectedDate),
+
 
 
 startTime:
 document.getElementById("start").value,
+
 
 
 endTime:
@@ -738,21 +1359,76 @@ document.getElementById("end").value
 
 
 
+
+
+
+let res =
 await fetch("/api/assignments",{
+
 
 method:"POST",
 
+
 headers:{
+
 
 "Content-Type":"application/json"
 
+
 },
+
 
 body:
 JSON.stringify(body)
 
 
+
 });
+
+
+
+
+
+let data =
+await res.json();
+
+
+
+
+
+
+
+if(data.needConfirm){
+
+
+
+showConfirm(
+
+data.message,
+
+()=>{
+
+
+body.ignoreLimit=true;
+
+
+forceSave(body);
+
+
+}
+
+);
+
+
+
+return;
+
+
+
+}
+
+
+
 
 
 
@@ -762,6 +1438,10 @@ closeModal();
 alert("נשמר בהצלחה");
 
 
+buildCalendar();
+
+
+
 }
 
 
@@ -772,11 +1452,70 @@ alert("נשמר בהצלחה");
 
 
 
+async function forceSave(body){
+
+
+
+await fetch("/api/assignments",{
+
+
+method:"POST",
+
+
+headers:{
+
+
+"Content-Type":"application/json"
+
+
+},
+
+
+body:
+JSON.stringify(body)
+
+
+
+});
+
+
+
+
+
+closeConfirm();
+
+
+closeModal();
+
+
+alert("נשמר בהצלחה");
+
+
+buildCalendar();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ============================
+// Delete
+// ============================
+
 async function deleteAssignment(id){
 
 
 await fetch(
+
 `/api/assignments/${id}`,
+
 {
 
 method:"DELETE"
@@ -786,10 +1525,11 @@ method:"DELETE"
 );
 
 
+
 closeModal();
 
 
-openView(selectedDate);
+buildCalendar();
 
 
 
@@ -803,19 +1543,102 @@ openView(selectedDate);
 
 
 
+// ============================
+// Confirm Modal
+// ============================
+
+function showConfirm(
+text,
+yesFunction
+){
+
+
+
+pendingAssignment =
+yesFunction;
+
+
+
+
+document.getElementById("confirmText")
+.innerHTML =
+text;
+
+
+
+
+document.getElementById("confirmModal")
+.classList.add("active");
+
+
+
+}
+
+
+
+
+
+
+document.getElementById("confirmYes")
+.onclick=()=>{
+
+
+if(pendingAssignment){
+
+
+pendingAssignment();
+
+
+}
+
+
+};
+
+
+
+
+
+document.getElementById("confirmNo")
+.onclick =
+closeConfirm;
+
+
+
+
+
+
+function closeConfirm(){
+
+
+document.getElementById("confirmModal")
+.classList.remove("active");
+
+
+
+pendingAssignment=null;
+
+
+}
+
+
+
+
+
+
 
 
 
 // ============================
-// Modal
+// Main Modal
 // ============================
-
 
 function openModal(title){
 
 
 document.getElementById("modalTitle")
-.textContent=title;
+.textContent =
+title;
+
 
 
 document.getElementById("modal")
@@ -823,6 +1646,9 @@ document.getElementById("modal")
 
 
 }
+
+
+
 
 
 
@@ -837,8 +1663,15 @@ document.getElementById("modal")
 
 
 
+
+
 document.getElementById("close")
-.onclick=closeModal;
+.onclick =
+closeModal;
+
+
+
+
 
 
 
@@ -848,12 +1681,107 @@ document.getElementById("modal")
 
 if(e.target.id==="modal"){
 
+
 closeModal();
+
 
 }
 
 
 };
+
+
+
+
+
+
+
+
+
+// ============================
+// Theme Switch
+// ============================
+
+const themeButton =
+document.getElementById("themeToggle");
+
+
+
+
+
+
+
+function loadTheme(){
+
+
+let theme =
+localStorage.getItem("theme");
+
+
+
+if(theme==="dark"){
+
+
+
+document.body.classList.add("dark");
+
+
+themeButton.textContent="☀️";
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+themeButton.onclick=()=>{
+
+
+
+document.body.classList.toggle("dark");
+
+
+
+let dark =
+document.body.classList.contains("dark");
+
+
+
+localStorage.setItem(
+
+"theme",
+
+dark ? "dark" : "light"
+
+);
+
+
+
+
+themeButton.textContent =
+dark
+?
+"☀️"
+:
+"🌙";
+
+
+
+};
+
+
+
+
+
+
+loadTheme();
+
 
 
 

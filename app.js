@@ -12,9 +12,12 @@ const PORT = 3000;
 // MongoDB Connection
 // ============================
 
-mongoose.connect("mongodb+srv://Yair:Yair2004@cluster0.fg959i9.mongodb.net/")
+mongoose.connect(
+    "mongodb+srv://Yair:Yair2004@cluster0.fg959i9.mongodb.net/"
+)
 .then(() => console.log("Connected to MongoDB"))
 .catch(err => console.log(err));
+
 
 
 
@@ -22,7 +25,10 @@ mongoose.connect("mongodb+srv://Yair:Yair2004@cluster0.fg959i9.mongodb.net/")
 // Middleware
 // ============================
 
-app.use(express.urlencoded({ extended:true }));
+app.use(express.urlencoded({
+    extended:true
+}));
+
 app.use(express.json());
 
 
@@ -37,7 +43,11 @@ app.use(session({
 }));
 
 
-app.use(express.static(path.join(__dirname,"public")));
+app.use(express.static(
+    path.join(__dirname,"public")
+));
+
+
 
 
 
@@ -46,22 +56,31 @@ app.use(express.static(path.join(__dirname,"public")));
 // User/Admin Schema
 // ============================
 
-
 const userSchema = new mongoose.Schema({
 
     username:{
+
         type:String,
+
         required:true,
+
         unique:true
+
     },
 
 
     password:{
+
         type:String,
+
         required:true
+
     }
 
+
 });
+
+
 
 
 
@@ -70,6 +89,7 @@ const User = mongoose.model(
     userSchema,
     "users"
 );
+
 
 
 const Admin = mongoose.model(
@@ -81,15 +101,15 @@ const Admin = mongoose.model(
 
 
 
+
+
+
+
 // ============================
 // Assignment Schema
 // ============================
-// Stores kitchen / guarding tasks
-// ============================
-
 
 const assignmentSchema = new mongoose.Schema({
-
 
     assignedUser:{
 
@@ -100,18 +120,33 @@ const assignmentSchema = new mongoose.Schema({
     },
 
 
+
     taskType:{
 
         type:String,
 
         enum:[
+
             "Kitchen",
-            "Guarding"
+            "Guarding",
+            "Other"
+
         ],
 
         required:true
 
     },
+
+
+
+    customName:{
+
+        type:String,
+
+        default:""
+
+    },
+
 
 
     date:{
@@ -123,6 +158,7 @@ const assignmentSchema = new mongoose.Schema({
     },
 
 
+
     startTime:{
 
         type:String,
@@ -130,6 +166,7 @@ const assignmentSchema = new mongoose.Schema({
         required:true
 
     },
+
 
 
     endTime:{
@@ -141,6 +178,7 @@ const assignmentSchema = new mongoose.Schema({
     },
 
 
+
     createdBy:{
 
         type:String,
@@ -148,6 +186,7 @@ const assignmentSchema = new mongoose.Schema({
         required:true
 
     },
+
 
 
     createdAt:{
@@ -163,6 +202,7 @@ const assignmentSchema = new mongoose.Schema({
 
 
 
+
 const Assignment = mongoose.model(
     "Assignment",
     assignmentSchema
@@ -174,10 +214,121 @@ const Assignment = mongoose.model(
 
 
 
+
+
+// ============================
+// Helper:
+// Get Sunday of current week
+// ============================
+
+function getStartOfWeek(){
+
+    const today = new Date();
+
+    const day = today.getDay();
+
+
+    const sunday = new Date(today);
+
+
+    sunday.setDate(
+        today.getDate()-day
+    );
+
+
+    sunday.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    return sunday;
+
+}
+
+
+
+
+
+
+
+// ============================
+// Delete old assignments
+// ============================
+
+async function clearOldAssignments(){
+
+
+    try{
+
+
+        const sunday =
+            getStartOfWeek();
+
+
+
+        const oldAssignments =
+            await Assignment.find();
+
+
+
+        for(const task of oldAssignments){
+
+
+            const taskDate =
+                new Date(task.date);
+
+
+
+            if(taskDate < sunday){
+
+
+                await Assignment.findByIdAndDelete(
+                    task._id
+                );
+
+
+            }
+
+
+        }
+
+
+    }
+    catch(err){
+
+        console.log(
+            "Cleanup error:",
+            err
+        );
+
+    }
+
+
+}
+
+
+
+
+
+setInterval(
+    clearOldAssignments,
+    1000 * 60 * 60
+);
+
+
+
+
+
+
+
+
+
 // ============================
 // Home Page
 // ============================
-
 
 app.get("/",(req,res)=>{
 
@@ -200,10 +351,12 @@ app.get("/",(req,res)=>{
 
 
 
+
+
+
 // ============================
 // Choice Page
 // ============================
-
 
 app.get("/choice",(req,res)=>{
 
@@ -213,6 +366,7 @@ app.get("/choice",(req,res)=>{
         return res.redirect("/");
 
     }
+
 
 
     res.sendFile(
@@ -233,10 +387,12 @@ app.get("/choice",(req,res)=>{
 
 
 
+
+
+
 // ============================
 // Calendar Page
 // ============================
-
 
 app.get("/calendar",(req,res)=>{
 
@@ -246,6 +402,7 @@ app.get("/calendar",(req,res)=>{
         return res.redirect("/");
 
     }
+
 
 
     res.sendFile(
@@ -267,10 +424,11 @@ app.get("/calendar",(req,res)=>{
 
 
 
+
+
 // ============================
 // Current User
 // ============================
-
 
 app.get("/user",(req,res)=>{
 
@@ -299,20 +457,11 @@ app.get("/user",(req,res)=>{
     });
 
 
-
 });
-
-
-
-
-
-
-
 
 // ============================
 // Register
 // ============================
-
 
 app.post("/register",async(req,res)=>{
 
@@ -327,12 +476,20 @@ app.post("/register",async(req,res)=>{
 
 
 
+
         const existingUser =
-            await User.findOne({username});
+            await User.findOne({
+                username
+            });
+
 
 
         const existingAdmin =
-            await Admin.findOne({username});
+            await Admin.findOne({
+                username
+            });
+
+
 
 
 
@@ -340,9 +497,7 @@ app.post("/register",async(req,res)=>{
 
 
             return res.redirect(
-
                 "/?error=Username%20already%20exists"
-
             );
 
 
@@ -352,20 +507,28 @@ app.post("/register",async(req,res)=>{
 
 
 
+
         const hashedPassword =
-            await bcrypt.hash(password,10);
+            await bcrypt.hash(
+                password,
+                10
+            );
 
 
 
 
 
-        const newUser = new User({
 
-            username,
+        const newUser =
+            new User({
 
-            password:hashedPassword
+                username,
 
-        });
+                password:hashedPassword
+
+            });
+
+
 
 
 
@@ -374,12 +537,16 @@ app.post("/register",async(req,res)=>{
 
 
 
+
+
         req.session.user =
-            newUser.username;
+            username;
+
 
 
         req.session.isAdmin =
             false;
+
 
 
 
@@ -392,6 +559,7 @@ app.post("/register",async(req,res)=>{
 
 
         console.log(err);
+
 
 
         res.redirect(
@@ -413,10 +581,11 @@ app.post("/register",async(req,res)=>{
 
 
 
+
+
 // ============================
 // Login
 // ============================
-
 
 app.post("/login",async(req,res)=>{
 
@@ -425,14 +594,23 @@ app.post("/login",async(req,res)=>{
 
 
         const {
+
             username,
+
             password
+
         } = req.body;
 
 
 
+
+
+
         let account =
-            await User.findOne({username});
+            await User.findOne({
+                username
+            });
+
 
 
 
@@ -442,11 +620,14 @@ app.post("/login",async(req,res)=>{
 
 
 
+
         if(!account){
 
 
             account =
-                await Admin.findOne({username});
+                await Admin.findOne({
+                    username
+                });
 
 
 
@@ -463,13 +644,12 @@ app.post("/login",async(req,res)=>{
 
 
 
+
         if(!account){
 
 
             return res.redirect(
-
                 "/?error=User%20not%20found"
-
             );
 
 
@@ -479,11 +659,17 @@ app.post("/login",async(req,res)=>{
 
 
 
+
+
         const validPassword =
             await bcrypt.compare(
+
                 password,
+
                 account.password
+
             );
+
 
 
 
@@ -493,13 +679,13 @@ app.post("/login",async(req,res)=>{
 
 
             return res.redirect(
-
                 "/?error=Incorrect%20password"
-
             );
 
 
         }
+
+
 
 
 
@@ -517,6 +703,8 @@ app.post("/login",async(req,res)=>{
 
 
 
+
+
         res.redirect("/choice");
 
 
@@ -530,14 +718,11 @@ app.post("/login",async(req,res)=>{
 
 
         res.redirect(
-
             "/?error=Server%20error"
-
         );
 
 
     }
-
 
 
 });
@@ -549,32 +734,48 @@ app.post("/login",async(req,res)=>{
 
 
 
+
+
+
+
 // ============================
 // Get All Users
-// Only Admins
+// Admin Only
 // ============================
-
 
 app.get("/api/users",async(req,res)=>{
 
 
     if(!req.session.user){
 
+
         return res.status(401).json({
+
             error:"Not logged in"
+
         });
 
+
     }
+
+
 
 
 
     if(!req.session.isAdmin){
 
+
         return res.status(403).json({
+
             error:"Admins only"
+
         });
 
+
     }
+
+
+
 
 
 
@@ -582,24 +783,35 @@ app.get("/api/users",async(req,res)=>{
 
 
         const users =
-            await User.find({},{
-                username:1,
-                _id:0
-            });
+            await User.find(
+                {},
+                {
+                    username:1,
+                    _id:0
+                }
+            );
 
 
 
         const admins =
-            await Admin.find({},{
-                username:1,
-                _id:0
-            });
+            await Admin.find(
+                {},
+                {
+                    username:1,
+                    _id:0
+                }
+            );
+
+
 
 
 
         res.json([
+
             ...users,
+
             ...admins
+
         ]);
 
 
@@ -611,43 +823,68 @@ app.get("/api/users",async(req,res)=>{
         console.log(err);
 
 
+
         res.status(500).json({
+
             error:"Server error"
+
         });
 
 
     }
-
 
 
 });
 
 
+
+
+
+
+
+
+
+
+
 // ============================
 // Get Assignments
-// ============================
-// Admins see all assignments
-// Regular users see only their assignments
+//
+// Admin:
+// sees all tasks
+//
+// User:
+// sees only his tasks
 // ============================
 
-
-app.get("/api/assignments", async(req,res)=>{
+app.get("/api/assignments",async(req,res)=>{
 
 
     if(!req.session.user){
 
+
         return res.status(401).json({
+
             error:"Not logged in"
+
         });
 
+
     }
+
+
 
 
 
     try{
 
 
-        const {date} = req.query;
+        const {
+
+            date
+
+        } = req.query;
+
+
 
 
 
@@ -655,10 +892,13 @@ app.get("/api/assignments", async(req,res)=>{
 
 
 
+
+
+
+
         if(req.session.isAdmin){
 
 
-            // Admin sees everything
 
             if(date){
 
@@ -671,10 +911,9 @@ app.get("/api/assignments", async(req,res)=>{
         else{
 
 
-            // User sees only his tasks
-
             query.assignedUser =
                 req.session.user;
+
 
 
             if(date){
@@ -690,12 +929,20 @@ app.get("/api/assignments", async(req,res)=>{
 
 
 
+
+
         const assignments =
             await Assignment
             .find(query)
             .sort({
+
                 startTime:1
+
             });
+
+
+
+
 
 
 
@@ -710,8 +957,11 @@ app.get("/api/assignments", async(req,res)=>{
         console.log(err);
 
 
+
         res.status(500).json({
+
             error:"Server error"
+
         });
 
 
@@ -729,33 +979,282 @@ app.get("/api/assignments", async(req,res)=>{
 
 
 
+
+
 // ============================
-// Create Assignment
-// Only Admins
+// Get task dots for calendar
+// ============================
+//
+// Returns tasks grouped by date
+// Used for showing dots
 // ============================
 
+app.get("/api/calendar-dots",async(req,res)=>{
+
+
+    if(!req.session.user){
+
+
+        return res.status(401).json({
+
+            error:"Not logged in"
+
+        });
+
+
+    }
+
+
+
+
+
+
+    try{
+
+
+        let query={};
+
+
+
+
+        if(!req.session.isAdmin){
+
+
+            query.assignedUser =
+                req.session.user;
+
+
+        }
+
+
+
+
+
+
+
+        const tasks =
+            await Assignment.find(query);
+
+
+
+
+
+
+        let result={};
+
+
+
+
+
+
+        tasks.forEach(task=>{
+
+
+
+            if(!result[task.date]){
+
+
+                result[task.date]=[];
+
+            }
+
+
+
+
+            result[task.date].push({
+
+                type:task.taskType
+
+            });
+
+
+
+        });
+
+
+
+
+
+
+        res.json(result);
+
+
+
+    }
+    catch(err){
+
+
+        console.log(err);
+
+
+
+        res.status(500).json({
+
+            error:"Server error"
+
+        });
+
+
+    }
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+// ============================
+// Check weekly task limit
+// ============================
+
+app.get("/api/check-week-tasks/:username",
+async(req,res)=>{
+
+
+    if(!req.session.user || !req.session.isAdmin){
+
+
+        return res.status(403).json({
+
+            error:"Admins only"
+
+        });
+
+
+    }
+
+
+
+
+
+
+    try{
+
+
+        const sunday =
+            getStartOfWeek();
+
+
+
+
+
+        const tasks =
+            await Assignment.find({
+
+                assignedUser:req.params.username
+
+            });
+
+
+
+
+
+        let count=0;
+
+
+
+
+
+        tasks.forEach(task=>{
+
+
+            const taskDate =
+                new Date(task.date);
+
+
+
+
+            if(taskDate >= sunday){
+
+
+                count++;
+
+
+            }
+
+
+        });
+
+
+
+
+
+
+
+        res.json({
+
+            count
+
+        });
+
+
+
+    }
+    catch(err){
+
+
+        console.log(err);
+
+
+
+        res.status(500).json({
+
+            error:"Server error"
+
+        });
+
+
+    }
+
+
+
+});
+
+// ============================
+// Create Assignment
+// Admin Only
+// ============================
 
 app.post("/api/assignments",async(req,res)=>{
 
 
     if(!req.session.user){
 
+
         return res.status(401).json({
+
             error:"Not logged in"
+
         });
 
+
     }
+
+
 
 
 
 
     if(!req.session.isAdmin){
 
+
         return res.status(403).json({
+
             error:"Admins only"
+
         });
 
+
     }
+
+
 
 
 
@@ -769,11 +1268,15 @@ app.post("/api/assignments",async(req,res)=>{
 
             taskType,
 
+            customName,
+
             date,
 
             startTime,
 
-            endTime
+            endTime,
+
+            ignoreLimit
 
         } = req.body;
 
@@ -781,12 +1284,21 @@ app.post("/api/assignments",async(req,res)=>{
 
 
 
+
+
+
         if(
+
             !assignedUser ||
+
             !taskType ||
+
             !date ||
+
             !startTime ||
+
             !endTime
+
         ){
 
 
@@ -805,22 +1317,134 @@ app.post("/api/assignments",async(req,res)=>{
 
 
 
+
+        // ============================
+        // Check weekly limit
+        // ============================
+
+        if(!ignoreLimit){
+
+
+
+            const sunday =
+                getStartOfWeek();
+
+
+
+
+
+            const userTasks =
+                await Assignment.find({
+
+                    assignedUser
+
+                });
+
+
+
+
+
+            let count=0;
+
+
+
+
+
+
+            userTasks.forEach(task=>{
+
+
+                const taskDate =
+                    new Date(task.date);
+
+
+
+                if(taskDate >= sunday){
+
+
+                    count++;
+
+
+                }
+
+
+            });
+
+
+
+
+
+
+
+            if(count >= 2){
+
+
+
+                return res.json({
+
+                    needConfirm:true,
+
+                    message:
+                    `${assignedUser} כבר יש 2 משימות השבוע, האם אתה בטוח שאתה רוצה להוסיף לו עוד?`
+
+
+                });
+
+
+            }
+
+
+
+        }
+
+
+
+
+
+
+
+
+
         const assignment =
             new Assignment({
 
+
                 assignedUser,
+
 
                 taskType,
 
+
+
+                customName:
+                    taskType==="Other"
+                    ?
+                    customName
+                    :
+                    "",
+
+
+
                 date,
+
+
 
                 startTime,
 
+
+
                 endTime,
 
-                createdBy:req.session.user
+
+
+                createdBy:
+                    req.session.user
+
+
 
             });
+
+
 
 
 
@@ -832,7 +1456,15 @@ app.post("/api/assignments",async(req,res)=>{
 
 
 
-        res.json(assignment);
+
+        res.json({
+
+            success:true,
+
+            assignment
+
+        });
+
 
 
 
@@ -843,12 +1475,12 @@ app.post("/api/assignments",async(req,res)=>{
         console.log(err);
 
 
+
         res.status(500).json({
 
             error:"Server error"
 
         });
-
 
 
     }
@@ -865,33 +1497,50 @@ app.post("/api/assignments",async(req,res)=>{
 
 
 
+
+
+
 // ============================
 // Delete Assignment
-// Only Admins
+// Admin Only
 // ============================
 
-
-app.delete("/api/assignments/:id",async(req,res)=>{
+app.delete("/api/assignments/:id",
+async(req,res)=>{
 
 
     if(!req.session.user){
 
+
         return res.status(401).json({
+
             error:"Not logged in"
+
         });
 
+
     }
+
+
+
 
 
 
 
     if(!req.session.isAdmin){
 
+
         return res.status(403).json({
+
             error:"Admins only"
+
         });
 
+
     }
+
+
+
 
 
 
@@ -900,9 +1549,14 @@ app.delete("/api/assignments/:id",async(req,res)=>{
 
 
         const deleted =
+
             await Assignment.findByIdAndDelete(
+
                 req.params.id
+
             );
+
+
 
 
 
@@ -918,6 +1572,9 @@ app.delete("/api/assignments/:id",async(req,res)=>{
 
 
         }
+
+
+
 
 
 
@@ -959,10 +1616,12 @@ app.delete("/api/assignments/:id",async(req,res)=>{
 
 
 
+
+
+
 // ============================
 // Dashboard
 // ============================
-
 
 app.get("/dashboard",(req,res)=>{
 
@@ -976,6 +1635,7 @@ app.get("/dashboard",(req,res)=>{
 
 
     }
+
 
 
 
@@ -995,12 +1655,13 @@ app.get("/dashboard",(req,res)=>{
 
 
 
+
+
     res.send(
 
         `Welcome ${req.session.user}!`
 
     );
-
 
 
 });
@@ -1013,10 +1674,11 @@ app.get("/dashboard",(req,res)=>{
 
 
 
+
+
 // ============================
 // Logout
 // ============================
-
 
 app.get("/logout",(req,res)=>{
 
@@ -1040,19 +1702,28 @@ app.get("/logout",(req,res)=>{
 
 
 
+
+
 // ============================
 // Start Server
 // ============================
 
+app.listen(
 
-app.listen(PORT,"0.0.0.0",()=>{
+    PORT,
 
+    "0.0.0.0",
 
-    console.log(
-
-        "Server running on http://10.70.248.190:3000"
-
-    );
+    ()=>{
 
 
-});
+        console.log(
+
+            "Server running on http://10.70.248.190:3000"
+
+        );
+
+
+    }
+
+);
