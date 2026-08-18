@@ -14,7 +14,9 @@ body {
 }
 
 
-/* Top bar */
+/* ============================
+   TOP BAR
+============================ */
 
 .header {
 
@@ -27,12 +29,56 @@ body {
     justify-content: flex-end;
     align-items: center;
 
-    padding-right: 40px;
+    padding: 0 40px;
 
     box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 
+    position: relative;
+
 }
 
+
+/* ============================
+   BACK BUTTON
+============================ */
+
+.back-btn {
+
+    position: absolute;
+
+    left: 40px;
+
+    padding: 10px 24px;
+
+    border: none;
+
+    border-radius: 25px;
+
+    background: linear-gradient(135deg, #667eea, #764ba2);
+
+    color: white;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+}
+
+
+.back-btn:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+
+}
+
+
+/* ============================
+   USERNAME
+============================ */
 
 .username {
 
@@ -51,8 +97,9 @@ body {
 }
 
 
-
-/* Main area */
+/* ============================
+   MAIN AREA
+============================ */
 
 .container {
 
@@ -65,8 +112,9 @@ body {
 }
 
 
-
-/* Card */
+/* ============================
+   CARD
+============================ */
 
 .choice-card {
 
@@ -87,7 +135,6 @@ body {
 }
 
 
-
 .choice-card h1 {
 
     font-size: 34px;
@@ -97,7 +144,6 @@ body {
     margin-bottom: 15px;
 
 }
-
 
 
 .choice-card p {
@@ -111,8 +157,9 @@ body {
 }
 
 
-
-/* Buttons */
+/* ============================
+   BUTTONS
+============================ */
 
 .buttons {
 
@@ -123,7 +170,6 @@ body {
     gap: 20px;
 
 }
-
 
 
 .choice-btn {
@@ -149,7 +195,6 @@ body {
 }
 
 
-
 .choice-btn:hover {
 
     transform: translateY(-3px);
@@ -159,22 +204,90 @@ body {
 }
 
 
-
-/* Animation */
+/* ============================
+   ANIMATION
+============================ */
 
 @keyframes appear {
 
     from {
 
-        opacity:0;
+        opacity: 0;
+
         transform: translateY(20px);
 
     }
 
     to {
 
-        opacity:1;
+        opacity: 1;
+
         transform: translateY(0);
+
+    }
+
+}
+
+
+/* ============================
+   MOBILE
+============================ */
+
+@media (max-width: 500px) {
+
+    .header {
+
+        padding: 0 20px;
+
+    }
+
+
+    .back-btn {
+
+        left: 20px;
+
+        padding: 8px 18px;
+
+        font-size: 14px;
+
+    }
+
+
+    .username {
+
+        font-size: 16px;
+
+    }
+
+
+    .choice-card {
+
+        width: 90%;
+
+        padding: 30px 20px;
+
+    }
+
+
+    .choice-card h1 {
+
+        font-size: 28px;
+
+    }
+
+
+    .buttons {
+
+        flex-direction: column;
+
+        align-items: center;
+
+    }
+
+
+    .choice-btn {
+
+        width: 180px;
 
     }
 

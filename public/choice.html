@@ -14,16 +14,26 @@
 
     <header class="header">
 
+        <!-- BACK BUTTON - TOP LEFT -->
+        <button class="back-btn" onclick="window.location.href='/verification.html'">
+            חזרה
+        </button>
+
+
+        <!-- USERNAME - CENTER -->
         <div class="username">
+
             <span id="username">Username</span>
 
             <script>
-            fetch("/user")
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("username").textContent = "שלום " + data.username;
-            });
+                fetch("/user")
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("username").textContent =
+                            "שלום " + data.username;
+                    });
             </script>
+
         </div>
 
     </header>
@@ -41,7 +51,7 @@
             <div class="buttons">
 
                 <button class="choice-btn" onclick="window.location.href='/calendar'">
-                   לו"ז
+                    לו"ז
                 </button>
 
                 <button class="choice-btn">
