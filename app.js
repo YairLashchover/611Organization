@@ -19,8 +19,6 @@ mongoose.connect(
 .catch(err => console.log(err));
 
 
-
-
 // ============================
 // Middleware
 // ============================
@@ -30,7 +28,6 @@ app.use(express.urlencoded({
 }));
 
 app.use(express.json());
-
 
 app.use(session({
 
@@ -42,14 +39,9 @@ app.use(session({
 
 }));
 
-
 app.use(express.static(
     path.join(__dirname,"public")
 ));
-
-
-
-
 
 
 // ============================
@@ -68,7 +60,6 @@ const userSchema = new mongoose.Schema({
 
     },
 
-
     password:{
 
         type:String,
@@ -77,11 +68,7 @@ const userSchema = new mongoose.Schema({
 
     }
 
-
 });
-
-
-
 
 
 const User = mongoose.model(
@@ -91,18 +78,11 @@ const User = mongoose.model(
 );
 
 
-
 const Admin = mongoose.model(
     "Admin",
     userSchema,
     "admins"
 );
-
-
-
-
-
-
 
 
 // ============================
@@ -118,8 +98,6 @@ const assignmentSchema = new mongoose.Schema({
         required:true
 
     },
-
-
 
     taskType:{
 
@@ -137,8 +115,6 @@ const assignmentSchema = new mongoose.Schema({
 
     },
 
-
-
     customName:{
 
         type:String,
@@ -146,8 +122,6 @@ const assignmentSchema = new mongoose.Schema({
         default:""
 
     },
-
-
 
     date:{
 
@@ -157,8 +131,6 @@ const assignmentSchema = new mongoose.Schema({
 
     },
 
-
-
     startTime:{
 
         type:String,
@@ -166,8 +138,6 @@ const assignmentSchema = new mongoose.Schema({
         required:true
 
     },
-
-
 
     endTime:{
 
@@ -177,8 +147,6 @@ const assignmentSchema = new mongoose.Schema({
 
     },
 
-
-
     createdBy:{
 
         type:String,
@@ -186,8 +154,6 @@ const assignmentSchema = new mongoose.Schema({
         required:true
 
     },
-
-
 
     createdAt:{
 
@@ -197,23 +163,13 @@ const assignmentSchema = new mongoose.Schema({
 
     }
 
-
 });
-
-
 
 
 const Assignment = mongoose.model(
     "Assignment",
     assignmentSchema
 );
-
-
-
-
-
-
-
 
 
 // ============================
@@ -227,14 +183,11 @@ function getStartOfWeek(){
 
     const day = today.getDay();
 
-
     const sunday = new Date(today);
-
 
     sunday.setDate(
         today.getDate()-day
     );
-
 
     sunday.setHours(
         0,
@@ -243,15 +196,9 @@ function getStartOfWeek(){
         0
     );
 
-
     return sunday;
 
 }
-
-
-
-
-
 
 
 // ============================
@@ -260,41 +207,28 @@ function getStartOfWeek(){
 
 async function clearOldAssignments(){
 
-
     try{
-
 
         const sunday =
             getStartOfWeek();
 
-
-
         const oldAssignments =
             await Assignment.find();
 
-
-
         for(const task of oldAssignments){
-
 
             const taskDate =
                 new Date(task.date);
 
-
-
             if(taskDate < sunday){
-
 
                 await Assignment.findByIdAndDelete(
                     task._id
                 );
 
-
             }
 
-
         }
-
 
     }
     catch(err){
@@ -306,11 +240,7 @@ async function clearOldAssignments(){
 
     }
 
-
 }
-
-
-
 
 
 setInterval(
@@ -319,19 +249,11 @@ setInterval(
 );
 
 
-
-
-
-
-
-
-
 // ============================
 // Home Page
 // ============================
 
 app.get("/",(req,res)=>{
-
 
     res.sendFile(
 
@@ -343,15 +265,7 @@ app.get("/",(req,res)=>{
 
     );
 
-
 });
-
-
-
-
-
-
-
 
 
 // ============================
@@ -360,14 +274,11 @@ app.get("/",(req,res)=>{
 
 app.get("/choice",(req,res)=>{
 
-
     if(!req.session.user){
 
         return res.redirect("/");
 
     }
-
-
 
     res.sendFile(
 
@@ -379,15 +290,7 @@ app.get("/choice",(req,res)=>{
 
     );
 
-
 });
-
-
-
-
-
-
-
 
 
 // ============================
@@ -396,14 +299,11 @@ app.get("/choice",(req,res)=>{
 
 app.get("/calendar",(req,res)=>{
 
-
     if(!req.session.user){
 
         return res.redirect("/");
 
     }
-
-
 
     res.sendFile(
 
@@ -415,15 +315,7 @@ app.get("/calendar",(req,res)=>{
 
     );
 
-
 });
-
-
-
-
-
-
-
 
 
 // ============================
@@ -432,9 +324,7 @@ app.get("/calendar",(req,res)=>{
 
 app.get("/user",(req,res)=>{
 
-
     if(!req.session.user){
-
 
         return res.json({
 
@@ -443,10 +333,7 @@ app.get("/user",(req,res)=>{
 
         });
 
-
     }
-
-
 
     res.json({
 
@@ -456,8 +343,8 @@ app.get("/user",(req,res)=>{
 
     });
 
-
 });
+
 
 // ============================
 // Register
@@ -465,16 +352,12 @@ app.get("/user",(req,res)=>{
 
 app.post("/register",async(req,res)=>{
 
-
     try{
-
 
         const {
             username,
             password
         } = req.body;
-
-
 
 
         const existingUser =
@@ -483,29 +366,19 @@ app.post("/register",async(req,res)=>{
             });
 
 
-
         const existingAdmin =
             await Admin.findOne({
                 username
             });
 
 
-
-
-
         if(existingUser || existingAdmin){
-
 
             return res.redirect(
                 "/?error=Username%20already%20exists"
             );
 
-
         }
-
-
-
-
 
 
         const hashedPassword =
@@ -513,10 +386,6 @@ app.post("/register",async(req,res)=>{
                 password,
                 10
             );
-
-
-
-
 
 
         const newUser =
@@ -529,58 +398,30 @@ app.post("/register",async(req,res)=>{
             });
 
 
-
-
-
         await newUser.save();
-
-
-
-
 
 
         req.session.user =
             username;
 
-
-
         req.session.isAdmin =
             false;
 
 
-
-
         res.redirect("/choice");
-
-
 
     }
     catch(err){
 
-
         console.log(err);
-
-
 
         res.redirect(
             "/?error=Server%20error"
         );
 
-
     }
 
-
-
 });
-
-
-
-
-
-
-
-
-
 
 
 // ============================
@@ -589,9 +430,7 @@ app.post("/register",async(req,res)=>{
 
 app.post("/login",async(req,res)=>{
 
-
     try{
-
 
         const {
 
@@ -602,34 +441,21 @@ app.post("/login",async(req,res)=>{
         } = req.body;
 
 
-
-
-
-
         let account =
             await User.findOne({
                 username
             });
 
 
-
-
         let isAdmin=false;
 
 
-
-
-
-
         if(!account){
-
 
             account =
                 await Admin.findOne({
                     username
                 });
-
-
 
             if(account){
 
@@ -637,28 +463,16 @@ app.post("/login",async(req,res)=>{
 
             }
 
-
         }
 
 
-
-
-
-
         if(!account){
-
 
             return res.redirect(
                 "/?error=User%20not%20found"
             );
 
-
         }
-
-
-
-
-
 
 
         const validPassword =
@@ -671,71 +485,36 @@ app.post("/login",async(req,res)=>{
             );
 
 
-
-
-
-
         if(!validPassword){
-
 
             return res.redirect(
                 "/?error=Incorrect%20password"
             );
 
-
         }
-
-
-
-
-
-
 
 
         req.session.user =
             account.username;
 
-
-
         req.session.isAdmin =
             isAdmin;
 
 
-
-
-
-
         res.redirect("/choice");
-
-
 
     }
     catch(err){
 
-
         console.log(err);
-
-
 
         res.redirect(
             "/?error=Server%20error"
         );
 
-
     }
 
-
 });
-
-
-
-
-
-
-
-
-
-
 
 
 // ============================
@@ -745,9 +524,7 @@ app.post("/login",async(req,res)=>{
 
 app.get("/api/users",async(req,res)=>{
 
-
     if(!req.session.user){
-
 
         return res.status(401).json({
 
@@ -755,15 +532,10 @@ app.get("/api/users",async(req,res)=>{
 
         });
 
-
     }
 
 
-
-
-
     if(!req.session.isAdmin){
-
 
         return res.status(403).json({
 
@@ -771,16 +543,10 @@ app.get("/api/users",async(req,res)=>{
 
         });
 
-
     }
 
 
-
-
-
-
     try{
-
 
         const users =
             await User.find(
@@ -790,7 +556,6 @@ app.get("/api/users",async(req,res)=>{
                     _id:0
                 }
             );
-
 
 
         const admins =
@@ -803,9 +568,6 @@ app.get("/api/users",async(req,res)=>{
             );
 
 
-
-
-
         res.json([
 
             ...users,
@@ -814,15 +576,10 @@ app.get("/api/users",async(req,res)=>{
 
         ]);
 
-
-
     }
     catch(err){
 
-
         console.log(err);
-
-
 
         res.status(500).json({
 
@@ -830,37 +587,18 @@ app.get("/api/users",async(req,res)=>{
 
         });
 
-
     }
-
 
 });
 
 
-
-
-
-
-
-
-
-
-
 // ============================
 // Get Assignments
-//
-// Admin:
-// sees all tasks
-//
-// User:
-// sees only his tasks
 // ============================
 
 app.get("/api/assignments",async(req,res)=>{
 
-
     if(!req.session.user){
-
 
         return res.status(401).json({
 
@@ -868,15 +606,10 @@ app.get("/api/assignments",async(req,res)=>{
 
         });
 
-
     }
 
 
-
-
-
     try{
-
 
         const {
 
@@ -885,36 +618,22 @@ app.get("/api/assignments",async(req,res)=>{
         } = req.query;
 
 
-
-
-
         let query={};
-
-
-
-
-
 
 
         if(req.session.isAdmin){
 
-
-
             if(date){
 
                 query.date=date;
 
             }
-
 
         }
         else{
 
-
             query.assignedUser =
                 req.session.user;
-
-
 
             if(date){
 
@@ -922,13 +641,7 @@ app.get("/api/assignments",async(req,res)=>{
 
             }
 
-
         }
-
-
-
-
-
 
 
         const assignments =
@@ -941,22 +654,12 @@ app.get("/api/assignments",async(req,res)=>{
             });
 
 
-
-
-
-
-
         res.json(assignments);
-
-
 
     }
     catch(err){
 
-
         console.log(err);
-
-
 
         res.status(500).json({
 
@@ -964,36 +667,18 @@ app.get("/api/assignments",async(req,res)=>{
 
         });
 
-
     }
 
-
-
 });
-
-
-
-
-
-
-
-
-
 
 
 // ============================
 // Get task dots for calendar
 // ============================
-//
-// Returns tasks grouped by date
-// Used for showing dots
-// ============================
 
 app.get("/api/calendar-dots",async(req,res)=>{
 
-
     if(!req.session.user){
-
 
         return res.status(401).json({
 
@@ -1001,64 +686,36 @@ app.get("/api/calendar-dots",async(req,res)=>{
 
         });
 
-
     }
-
-
-
-
 
 
     try{
 
-
         let query={};
-
-
 
 
         if(!req.session.isAdmin){
 
-
             query.assignedUser =
                 req.session.user;
 
-
         }
-
-
-
-
-
 
 
         const tasks =
             await Assignment.find(query);
 
 
-
-
-
-
         let result={};
-
-
-
-
 
 
         tasks.forEach(task=>{
 
-
-
             if(!result[task.date]){
-
 
                 result[task.date]=[];
 
             }
-
-
 
 
             result[task.date].push({
@@ -1067,26 +724,15 @@ app.get("/api/calendar-dots",async(req,res)=>{
 
             });
 
-
-
         });
-
-
-
-
 
 
         res.json(result);
 
-
-
     }
     catch(err){
 
-
         console.log(err);
-
-
 
         res.status(500).json({
 
@@ -1094,20 +740,9 @@ app.get("/api/calendar-dots",async(req,res)=>{
 
         });
 
-
     }
 
-
 });
-
-
-
-
-
-
-
-
-
 
 
 // ============================
@@ -1117,9 +752,7 @@ app.get("/api/calendar-dots",async(req,res)=>{
 app.get("/api/check-week-tasks/:username",
 async(req,res)=>{
 
-
     if(!req.session.user || !req.session.isAdmin){
-
 
         return res.status(403).json({
 
@@ -1127,22 +760,13 @@ async(req,res)=>{
 
         });
 
-
     }
-
-
-
-
 
 
     try{
 
-
         const sunday =
             getStartOfWeek();
-
-
-
 
 
         const tasks =
@@ -1153,39 +777,21 @@ async(req,res)=>{
             });
 
 
-
-
-
         let count=0;
-
-
-
 
 
         tasks.forEach(task=>{
 
-
             const taskDate =
                 new Date(task.date);
 
-
-
-
             if(taskDate >= sunday){
-
 
                 count++;
 
-
             }
 
-
         });
-
-
-
-
-
 
 
         res.json({
@@ -1194,15 +800,10 @@ async(req,res)=>{
 
         });
 
-
-
     }
     catch(err){
 
-
         console.log(err);
-
-
 
         res.status(500).json({
 
@@ -1210,12 +811,183 @@ async(req,res)=>{
 
         });
 
+    }
+
+});
+
+
+// ============================
+// Time Validation
+// ============================
+
+function isValidFiveMinuteTime(time){
+
+    if(typeof time !== "string"){
+
+        return false;
 
     }
 
 
+    if(!/^\d{2}:\d{2}$/.test(time)){
 
-});
+        return false;
+
+    }
+
+
+    const parts =
+        time.split(":");
+
+
+    const hours =
+        Number(parts[0]);
+
+    const minutes =
+        Number(parts[1]);
+
+
+    if(hours < 0 || hours > 23){
+
+        return false;
+
+    }
+
+
+    if(minutes < 0 || minutes > 59){
+
+        return false;
+
+    }
+
+
+    return minutes % 5 === 0;
+
+}
+
+
+function isValidNormalTime(time){
+
+    if(typeof time !== "string"){
+
+        return false;
+
+    }
+
+
+    return /^\d{2}:\d{2}$/.test(time);
+
+}
+
+
+// ============================
+// Validate Assignment Time
+// ============================
+
+function validateAssignmentTime(
+    taskType,
+    startTime,
+    endTime
+){
+
+    /*
+       Kitchen:
+       - 07:00 - 14:00
+       - 14:00 - CLOSING
+       - custom times in 5-minute increments
+    */
+
+    if(taskType==="Kitchen"){
+
+        if(endTime==="CLOSING"){
+
+            if(startTime!=="14:00"){
+
+                return "זמן מטבח לא תקין";
+
+            }
+
+            return null;
+
+        }
+
+
+        if(!isValidFiveMinuteTime(startTime)){
+
+            return "זמן התחלה חייב להיות בקפיצות של 5 דקות";
+
+        }
+
+
+        if(!isValidFiveMinuteTime(endTime)){
+
+            return "זמן סיום חייב להיות בקפיצות של 5 דקות";
+
+        }
+
+
+        return null;
+
+    }
+
+
+    /*
+       Guarding:
+       - fixed presets
+       - custom times in 5-minute increments
+    */
+
+    if(taskType==="Guarding"){
+
+        if(!isValidFiveMinuteTime(startTime)){
+
+            return "זמן התחלה חייב להיות בקפיצות של 5 דקות";
+
+        }
+
+
+        if(!isValidFiveMinuteTime(endTime)){
+
+            return "זמן סיום חייב להיות בקפיצות של 5 דקות";
+
+        }
+
+
+        return null;
+
+    }
+
+
+    /*
+       Other:
+       Keep the old behavior.
+    */
+
+    if(taskType==="Other"){
+
+        if(!isValidNormalTime(startTime)){
+
+            return "זמן התחלה לא תקין";
+
+        }
+
+
+        if(!isValidNormalTime(endTime)){
+
+            return "זמן סיום לא תקין";
+
+        }
+
+
+        return null;
+
+    }
+
+
+    return "סוג משימה לא תקין";
+
+}
+
 
 // ============================
 // Create Assignment
@@ -1224,9 +996,7 @@ async(req,res)=>{
 
 app.post("/api/assignments",async(req,res)=>{
 
-
     if(!req.session.user){
-
 
         return res.status(401).json({
 
@@ -1234,16 +1004,10 @@ app.post("/api/assignments",async(req,res)=>{
 
         });
 
-
     }
 
 
-
-
-
-
     if(!req.session.isAdmin){
-
 
         return res.status(403).json({
 
@@ -1251,16 +1015,10 @@ app.post("/api/assignments",async(req,res)=>{
 
         });
 
-
     }
 
 
-
-
-
-
     try{
-
 
         const {
 
@@ -1281,12 +1039,6 @@ app.post("/api/assignments",async(req,res)=>{
         } = req.body;
 
 
-
-
-
-
-
-
         if(
 
             !assignedUser ||
@@ -1301,21 +1053,36 @@ app.post("/api/assignments",async(req,res)=>{
 
         ){
 
-
             return res.status(400).json({
 
                 error:"Missing information"
 
             });
 
-
         }
 
 
+        // ============================
+        // Validate Time
+        // ============================
+
+        const timeError =
+            validateAssignmentTime(
+                taskType,
+                startTime,
+                endTime
+            );
 
 
+        if(timeError){
 
+            return res.status(400).json({
 
+                error:timeError
+
+            });
+
+        }
 
 
         // ============================
@@ -1324,13 +1091,8 @@ app.post("/api/assignments",async(req,res)=>{
 
         if(!ignoreLimit){
 
-
-
             const sunday =
                 getStartOfWeek();
-
-
-
 
 
             const userTasks =
@@ -1341,44 +1103,24 @@ app.post("/api/assignments",async(req,res)=>{
                 });
 
 
-
-
-
             let count=0;
-
-
-
-
 
 
             userTasks.forEach(task=>{
 
-
                 const taskDate =
                     new Date(task.date);
 
-
-
                 if(taskDate >= sunday){
-
 
                     count++;
 
-
                 }
-
 
             });
 
 
-
-
-
-
-
             if(count >= 2){
-
-
 
                 return res.json({
 
@@ -1387,34 +1129,19 @@ app.post("/api/assignments",async(req,res)=>{
                     message:
                     `${assignedUser} כבר יש 2 משימות השבוע, האם אתה בטוח שאתה רוצה להוסיף לו עוד?`
 
-
                 });
-
 
             }
 
-
-
         }
-
-
-
-
-
-
-
 
 
         const assignment =
             new Assignment({
 
-
                 assignedUser,
 
-
                 taskType,
-
-
 
                 customName:
                     taskType==="Other"
@@ -1423,38 +1150,19 @@ app.post("/api/assignments",async(req,res)=>{
                     :
                     "",
 
-
-
                 date,
-
-
 
                 startTime,
 
-
-
                 endTime,
-
-
 
                 createdBy:
                     req.session.user
 
-
-
             });
 
 
-
-
-
-
-
         await assignment.save();
-
-
-
-
 
 
         res.json({
@@ -1465,16 +1173,10 @@ app.post("/api/assignments",async(req,res)=>{
 
         });
 
-
-
-
     }
     catch(err){
 
-
         console.log(err);
-
-
 
         res.status(500).json({
 
@@ -1482,22 +1184,9 @@ app.post("/api/assignments",async(req,res)=>{
 
         });
 
-
     }
 
-
-
 });
-
-
-
-
-
-
-
-
-
-
 
 
 // ============================
@@ -1508,9 +1197,7 @@ app.post("/api/assignments",async(req,res)=>{
 app.delete("/api/assignments/:id",
 async(req,res)=>{
 
-
     if(!req.session.user){
-
 
         return res.status(401).json({
 
@@ -1518,17 +1205,10 @@ async(req,res)=>{
 
         });
 
-
     }
 
 
-
-
-
-
-
     if(!req.session.isAdmin){
-
 
         return res.status(403).json({
 
@@ -1536,17 +1216,10 @@ async(req,res)=>{
 
         });
 
-
     }
 
 
-
-
-
-
-
     try{
-
 
         const deleted =
 
@@ -1557,12 +1230,7 @@ async(req,res)=>{
             );
 
 
-
-
-
-
         if(!deleted){
-
 
             return res.status(404).json({
 
@@ -1570,13 +1238,7 @@ async(req,res)=>{
 
             });
 
-
         }
-
-
-
-
-
 
 
         res.json({
@@ -1585,15 +1247,10 @@ async(req,res)=>{
 
         });
 
-
-
     }
     catch(err){
 
-
         console.log(err);
-
-
 
         res.status(500).json({
 
@@ -1601,22 +1258,9 @@ async(req,res)=>{
 
         });
 
-
     }
 
-
-
 });
-
-
-
-
-
-
-
-
-
-
 
 
 // ============================
@@ -1625,23 +1269,16 @@ async(req,res)=>{
 
 app.get("/dashboard",(req,res)=>{
 
-
     if(!req.session.user){
-
 
         return res.send(
             "Please log in first."
         );
 
-
     }
 
 
-
-
-
     if(req.session.isAdmin){
-
 
         return res.send(
 
@@ -1649,12 +1286,7 @@ app.get("/dashboard",(req,res)=>{
 
         );
 
-
     }
-
-
-
-
 
 
     res.send(
@@ -1663,17 +1295,7 @@ app.get("/dashboard",(req,res)=>{
 
     );
 
-
 });
-
-
-
-
-
-
-
-
-
 
 
 // ============================
@@ -1682,26 +1304,13 @@ app.get("/dashboard",(req,res)=>{
 
 app.get("/logout",(req,res)=>{
 
-
     req.session.destroy(()=>{
-
 
         res.redirect("/");
 
-
     });
 
-
 });
-
-
-
-
-
-
-
-
-
 
 
 // ============================
@@ -1716,13 +1325,11 @@ app.listen(
 
     ()=>{
 
-
         console.log(
 
             "Server running on http://10.70.248.190:3000"
 
         );
-
 
     }
 

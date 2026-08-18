@@ -23,36 +23,25 @@
     <!-- LEFT SIDE -->
     <div class="logout-area">
 
-
         <button class="logout-btn" onclick="window.location.href='/choice'">
 
-        יציאה
+            יציאה
 
         </button>
 
-
     </div>
-
-
-
 
 
     <!-- CENTER -->
     <div class="username">
 
-
         <span id="username"></span>
-
 
     </div>
 
 
-
-
-
     <!-- RIGHT SIDE -->
     <div class="theme-area">
-
 
         <button id="themeToggle">
 
@@ -60,259 +49,140 @@
 
         </button>
 
-
     </div>
-
 
 
 </header>
 
 
-
-
-
-
-
-
-
 <div class="calendar-container">
 
 
+    <div class="week">
 
-<div class="week">
+        <h2>
 
+            השבוע
 
-<h2>
+        </h2>
 
-השבוע
+        <div class="days" id="thisWeek"></div>
 
-</h2>
-
-
-
-<div class="days" id="thisWeek"></div>
+    </div>
 
 
+    <div class="week">
 
-</div>
+        <h2>
 
+            השבוע הבא
 
+        </h2>
 
+        <div class="days" id="nextWeek"></div>
 
-
-
-
-<div class="week">
-
-
-<h2>
-
-השבוע הבא
-
-</h2>
-
-
-
-<div class="days" id="nextWeek"></div>
-
+    </div>
 
 
 </div>
-
-
-
-
-</div>
-
-
-
-
-
-
-
 
 
 <!-- Assignment Popup -->
 
-
 <div class="modal-overlay" id="modal">
 
+    <div class="modal-box">
 
+        <div class="modal-header">
 
-<div class="modal-box">
+            <h3 id="modalTitle"></h3>
 
+            <button id="close">
 
+                ×
 
-<div class="modal-header">
+            </button>
 
+        </div>
 
-<h3 id="modalTitle"></h3>
+        <div id="modalBody">
 
+        </div>
 
-
-<button id="close">
-
-×
-
-</button>
-
-
-</div>
-
-
-
-
-
-<div id="modalBody">
-
+    </div>
 
 </div>
-
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
 
 
 <!-- Confirmation Popup -->
 
-
 <div class="modal-overlay" id="confirmModal">
 
+    <div class="modal-box">
 
+        <div class="modal-header">
 
-<div class="modal-box">
+            <h3>
 
+                אישור
 
+            </h3>
 
-<div class="modal-header">
+        </div>
 
+        <div id="confirmText">
 
-<h3>
+        </div>
 
-אישור
+        <div class="confirm-buttons">
 
-</h3>
+            <button id="confirmYes">
 
+                כן
 
-</div>
+            </button>
 
+            <button id="confirmNo">
 
+                לא
 
+            </button>
 
+        </div>
 
-<div id="confirmText">
-
-
-</div>
-
-
-
-
-
-
-<div class="confirm-buttons">
-
-
-
-<button id="confirmYes">
-
-כן
-
-</button>
-
-
-
-
-<button id="confirmNo">
-
-לא
-
-</button>
-
-
+    </div>
 
 </div>
-
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
 
 
 <script>
 
-
 let isAdmin=false;
 
-
 let selectedDate=null;
-
 
 let pendingAssignment=null;
 
 
-
-
-
-
 const dayNames=[
 
-
-"ראשון",
-
-"שני",
-
-"שלישי",
-
-"רביעי",
-
-"חמישי",
-
-"שישי",
-
-"שבת"
-
+    "ראשון",
+    "שני",
+    "שלישי",
+    "רביעי",
+    "חמישי",
+    "שישי",
+    "שבת"
 
 ];
 
 
-
-
-
-
 const today=new Date();
-
 
 const currentDay=today.getDay();
 
 
-
-
-
 const sunday=new Date(today);
-
-
 
 sunday.setDate(
 
@@ -321,215 +191,125 @@ sunday.setDate(
 );
 
 
-
-
-
-
-
-
+/* ============================
+   Date Helpers
+============================ */
 
 function formatDate(date){
 
+    let y=date.getFullYear();
 
-let y=date.getFullYear();
+    let m=String(
+        date.getMonth()+1
+    ).padStart(2,"0");
 
+    let d=String(
+        date.getDate()
+    ).padStart(2,"0");
 
-
-let m=String(
-    date.getMonth()+1
-).padStart(2,"0");
-
-
-
-let d=String(
-    date.getDate()
-).padStart(2,"0");
-
-
-
-return `${y}-${m}-${d}`;
-
+    return `${y}-${m}-${d}`;
 
 }
-
-
-
-
-
-
-
 
 
 function isPast(date){
 
+    let now=new Date();
 
-let now=new Date();
+    now.setHours(
+        0,
+        0,
+        0,
+        0
+    );
 
+    let check=new Date(date);
 
-now.setHours(
-    0,
-    0,
-    0,
-    0
-);
+    check.setHours(
+        0,
+        0,
+        0,
+        0
+    );
 
-
-
-let check=new Date(date);
-
-
-check.setHours(
-    0,
-    0,
-    0,
-    0
-);
-
-
-
-return check < now;
-
+    return check < now;
 
 }
 
 
-
-
-
-
-
-
+/* ============================
+   Calendar Dots
+============================ */
 
 let calendarDots={};
 
 
-
-
-
-
-
 async function loadCalendarDots(){
 
+    let res =
+        await fetch("/api/calendar-dots");
 
-let res =
-await fetch("/api/calendar-dots");
-
-
-
-calendarDots =
-await res.json();
-
-
+    calendarDots =
+        await res.json();
 
 }
-
-
-
-
-
-
-
 
 
 function createDots(date){
 
+    let iso =
+        formatDate(date);
 
+    let tasks =
+        calendarDots[iso];
 
-let iso =
-formatDate(date);
+    if(!tasks || tasks.length===0){
 
+        return "";
 
+    }
 
+    let html=
+        `<div class="task-dots">`;
 
-let tasks =
-calendarDots[iso];
+    tasks.forEach(task=>{
 
+        let colorClass="";
 
+        if(task.type==="Guarding"){
 
+            colorClass="guard-dot";
 
+        }
+        else if(task.type==="Kitchen"){
 
-if(!tasks || tasks.length===0){
+            colorClass="kitchen-dot";
 
+        }
+        else{
 
-return "";
+            colorClass="other-dot";
 
+        }
 
-}
+        html+=`
 
+            <span class="${colorClass}"></span>
 
+        `;
 
+    });
 
-let html=
-`<div class="task-dots">`;
+    html+=`</div>`;
 
-
-
-
-
-tasks.forEach(task=>{
-
-
-
-let colorClass="";
-
-
-
-if(task.type==="Guarding"){
-
-
-colorClass="guard-dot";
-
-
-}
-else if(task.type==="Kitchen"){
-
-
-colorClass="kitchen-dot";
-
-
-}
-else{
-
-
-colorClass="other-dot";
-
+    return html;
 
 }
 
 
-
-
-html+=`
-
-<span class="${colorClass}"></span>
-
-`;
-
-
-
-});
-
-
-
-
-html+=`</div>`;
-
-
-
-
-return html;
-
-
-}
-
-
-
-
-
-
-// ============================
-// Create Week
-// ============================
+/* ============================
+   Create Week
+============================ */
 
 function createWeek(
     id,
@@ -537,252 +317,153 @@ function createWeek(
     isCurrent
 ){
 
+    const container =
+        document.getElementById(id);
+
+    for(let i=0;i<7;i++){
+
+        let date =
+            new Date(start);
+
+        date.setDate(
+            start.getDate()+i
+        );
+
+        let card =
+            document.createElement("div");
+
+        card.className="day";
 
 
-const container =
-document.getElementById(id);
+        if(isCurrent && i<currentDay){
+
+            card.classList.add("past");
+
+        }
 
 
+        card.innerHTML=`
+
+            <h3>
+
+                ${dayNames[i]}
+
+            </h3>
+
+            <p>
+
+                ${date.getDate()}/${date.getMonth()+1}
+
+            </p>
+
+            ${createDots(date)}
+
+            <div class="day-actions">
+
+                <button class="view">
+
+                    משימות
+
+                </button>
+
+                ${
+                    isAdmin && !isPast(date)
+
+                    ?
+
+                    `
+
+                    <button class="edit">
+
+                        הוסף משימה
+
+                    </button>
+
+                    `
+
+                    :
+
+                    ""
+
+                }
+
+            </div>
+
+        `;
 
 
-for(let i=0;i<7;i++){
+        card.querySelector(".view")
+        .onclick=()=>{
+
+            openView(date);
+
+        };
 
 
-
-let date =
-new Date(start);
-
+        let edit =
+            card.querySelector(".edit");
 
 
-date.setDate(
-    start.getDate()+i
-);
+        if(edit){
+
+            edit.onclick=()=>{
+
+                openEdit(date);
+
+            };
+
+        }
 
 
+        container.appendChild(card);
 
-
-
-let card =
-document.createElement("div");
-
-
-
-card.className="day";
-
-
-
-
-
-
-if(isCurrent && i<currentDay){
-
-
-card.classList.add("past");
-
+    }
 
 }
 
 
-
-
-
-card.innerHTML=`
-
-<h3>
-
-${dayNames[i]}
-
-</h3>
-
-
-
-<p>
-
-${date.getDate()}/${date.getMonth()+1}
-
-</p>
-
-
-
-${createDots(date)}
-
-
-
-
-<div class="day-actions">
-
-
-<button class="view">
-
-משימות
-
-</button>
-
-
-
-
-${
-isAdmin && !isPast(date)
-
-?
-
-`
-
-<button class="edit">
-
-הוסף משימה
-
-</button>
-
-`
-
-:
-
-""
-
-}
-
-
-
-</div>
-
-
-`;
-
-
-
-
-
-
-
-card.querySelector(".view")
-.onclick=()=>{
-
-
-openView(date);
-
-
-};
-
-
-
-
-
-let edit =
-card.querySelector(".edit");
-
-
-
-if(edit){
-
-
-edit.onclick=()=>{
-
-
-openEdit(date);
-
-
-};
-
-
-}
-
-
-
-container.appendChild(card);
-
-
-
-}
-
-
-}
-
-
-
-
-
-
-
-
-
-// ============================
-// Build Calendar
-// ============================
+/* ============================
+   Build Calendar
+============================ */
 
 async function buildCalendar(){
 
+    await loadCalendarDots();
+
+    document.getElementById("thisWeek")
+        .innerHTML="";
+
+    document.getElementById("nextWeek")
+        .innerHTML="";
 
 
-await loadCalendarDots();
+    createWeek(
+        "thisWeek",
+        sunday,
+        true
+    );
 
 
+    let next =
+        new Date(sunday);
+
+    next.setDate(
+        sunday.getDate()+7
+    );
 
 
-document.getElementById("thisWeek")
-.innerHTML="";
-
-
-
-document.getElementById("nextWeek")
-.innerHTML="";
-
-
-
-
-
-createWeek(
-
-"thisWeek",
-
-sunday,
-
-true
-
-);
-
-
-
-
-
-let next =
-new Date(sunday);
-
-
-
-next.setDate(
-    sunday.getDate()+7
-);
-
-
-
-
-
-createWeek(
-
-"nextWeek",
-
-next,
-
-false
-
-);
-
-
+    createWeek(
+        "nextWeek",
+        next,
+        false
+    );
 
 }
 
 
-
-
-
-
-
-
-
-// ============================
-// Load User
-// ============================
+/* ============================
+   Load User
+============================ */
 
 fetch("/user")
 
@@ -790,1001 +471,1096 @@ fetch("/user")
 
 .then(data=>{
 
+    document.getElementById("username")
+        .textContent =
+        "שלום " + data.username;
 
-document.getElementById("username")
-.textContent =
-"שלום " + data.username;
+    isAdmin =
+        data.isAdmin;
 
-
-
-isAdmin =
-data.isAdmin;
-
-
-
-buildCalendar();
-
-
+    buildCalendar();
 
 });
 
 
-
-
-
-
-
-
-
-// ============================
-// View Assignments
-// ============================
+/* ============================
+   View Assignments
+============================ */
 
 async function openView(date){
 
+    selectedDate=date;
 
+    let iso =
+        formatDate(date);
 
-selectedDate=date;
 
+    openModal(
 
+        `${dayNames[date.getDay()]} ${date.getDate()}/${date.getMonth()+1}`
 
+    );
 
-let iso =
-formatDate(date);
 
+    let res =
+        await fetch(
 
+            `/api/assignments?date=${iso}`
 
+        );
 
 
-openModal(
+    let data =
+        await res.json();
 
-`${dayNames[date.getDay()]} ${date.getDate()}/${date.getMonth()+1}`
 
-);
+    let html="";
 
 
+    if(data.length===0){
 
+        html=`
 
+            <p class="modal-empty">
 
+                אין משימות
 
-let res =
-await fetch(
+            </p>
 
-`/api/assignments?date=${iso}`
+        `;
 
-);
+    }
 
+    else{
 
+        data.forEach(a=>{
 
-let data =
-await res.json();
+            let taskName =
+                a.taskType==="Other"
 
+                ?
 
+                a.customName
 
+                :
 
+                (
 
-let html="";
+                    a.taskType==="Kitchen"
 
+                    ?
 
+                    "מטבח"
 
+                    :
 
+                    "שמירה"
 
-if(data.length===0){
+                );
 
 
+            let displayedEndTime =
+                a.endTime==="CLOSING"
 
-html=`
+                ?
 
-<p class="modal-empty">
+                "סגירה"
 
-אין משימות
+                :
 
-</p>
+                a.endTime;
 
-`;
 
+            html+=`
 
+                <div class="assignment">
 
-}
+                    <b>
 
-else{
+                        ${taskName}
 
+                    </b>
 
+                    <br>
 
-data.forEach(a=>{
+                    ${a.assignedUser}
 
+                    <br>
 
+                    ${a.startTime}
 
-let taskName =
-a.taskType==="Other"
-?
-a.customName
-:
-(
-a.taskType==="Kitchen"
-?
-"מטבח"
-:
-"שמירה"
-);
+                    -
 
+                    ${displayedEndTime}
 
+                    ${
+                        isAdmin
 
+                        ?
 
+                        `
 
+                        <br>
 
-html+=`
+                        <button onclick="deleteAssignment('${a._id}')">
 
-<div class="assignment">
+                            מחיקה
 
+                        </button>
 
-<b>
+                        `
 
-${taskName}
+                        :
 
-</b>
+                        ""
 
+                    }
 
+                </div>
 
-<br>
+            `;
 
+        });
 
+    }
 
-${a.assignedUser}
 
-
-
-<br>
-
-
-
-${a.startTime}
-
--
-
-${a.endTime}
-
-
-
-
-${
-isAdmin
-
-?
-
-`
-
-<br>
-
-<button onclick="deleteAssignment('${a._id}')">
-
-מחיקה
-
-</button>
-
-`
-
-:
-
-""
+    document.getElementById("modalBody")
+        .innerHTML =
+        html;
 
 }
 
 
-
-</div>
-
-`;
-
-
-
-});
-
-
-
-}
-
-
-
-
-document.getElementById("modalBody")
-.innerHTML =
-html;
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ============================
-// Create Assignment
-// ============================
+/* ============================
+   Create Assignment
+============================ */
 
 async function openEdit(date){
 
+    selectedDate=date;
+
+    openModal("יצירת משימה");
 
 
-selectedDate=date;
+    document.getElementById("modalBody")
+        .innerHTML=`
 
+        <h3>
 
+            בחר סוג משימה
 
-openModal("יצירת משימה");
+        </h3>
 
+        <button onclick="chooseType('Kitchen')">
 
+            מטבח
 
+        </button>
 
+        <button onclick="chooseType('Guarding')">
 
-document.getElementById("modalBody")
-.innerHTML=`
+            שמירה
 
-<h3>
+        </button>
 
-בחר סוג משימה
+        <button onclick="chooseType('Other')">
 
-</h3>
+            אחר
 
+        </button>
 
-
-<button onclick="chooseType('Kitchen')">
-
-מטבח
-
-</button>
-
-
-
-
-<button onclick="chooseType('Guarding')">
-
-שמירה
-
-</button>
-
-
-
-
-<button onclick="chooseType('Other')">
-
-אחר
-
-</button>
-
-`;
-
-
+        `;
 
 }
 
 
-
-
-
-
-
-
+/* ============================
+   Choose Task Type
+============================ */
 
 async function chooseType(type){
 
+    if(type==="Other"){
 
+        document.getElementById("modalBody")
+            .innerHTML=`
 
-if(type==="Other"){
+            <h3>
 
+                שם המשימה
 
+            </h3>
 
-document.getElementById("modalBody")
-.innerHTML=`
+            <input id="otherName" placeholder="שם המשימה">
 
-<h3>
+            <button onclick="chooseOtherName()">
 
-שם המשימה
+                המשך
 
-</h3>
+            </button>
 
+            `;
 
+        return;
 
-<input id="otherName" placeholder="שם המשימה">
+    }
 
-
-<button onclick="chooseOtherName()">
-
-המשך
-
-</button>
-
-`;
-
-
-
-return;
-
+    showUsers(type);
 
 }
 
 
-
-showUsers(type);
-
-
-
-}
-
-
-
-
-
-
-
-
+/* ============================
+   Other Name
+============================ */
 
 function chooseOtherName(){
 
+    let name =
+        document.getElementById("otherName")
+        .value
+        .trim();
 
 
-let name =
-document.getElementById("otherName")
-.value
-.trim();
+    if(!name){
+
+        alert("יש להכניס שם משימה");
+
+        return;
+
+    }
 
 
-
-
-
-if(!name){
-
-
-alert("יש להכניס שם משימה");
-
-
-return;
-
-
-}
-
-
-
-showUsers(
-"Other",
-name
-);
-
-
+    showUsers(
+        "Other",
+        name
+    );
 
 }
 
 
-
-
-
-
-
-
+/* ============================
+   Users
+============================ */
 
 async function showUsers(
-type,
-customName=""
+    type,
+    customName=""
 ){
 
+    document.getElementById("modalBody")
+        .innerHTML =
+        "טוען משתמשים...";
 
 
-document.getElementById("modalBody")
-.innerHTML=
-"טוען משתמשים...";
+    let res =
+        await fetch("/api/users");
+
+    let users =
+        await res.json();
 
 
+    let html=`
+
+        <h3>
+
+            בחר משתמש
+
+        </h3>
+
+    `;
 
 
+    users.forEach(u=>{
 
-let res =
-await fetch("/api/users");
+        html+=`
 
+            <button onclick="chooseUser('${type}','${u.username}','${customName}')">
 
+                ${u.username}
 
-let users =
-await res.json();
+            </button>
 
+        `;
 
-
-
-
-let html=`
-
-<h3>
-
-בחר משתמש
-
-</h3>
-
-`;
+    });
 
 
-
-
-
-users.forEach(u=>{
-
-
-html+=`
-
-<button onclick="chooseUser('${type}','${u.username}','${customName}')">
-
-${u.username}
-
-</button>
-
-`;
-
-
-
-});
-
-
-
-
-
-document.getElementById("modalBody")
-.innerHTML=
-html;
-
-
+    document.getElementById("modalBody")
+        .innerHTML =
+        html;
 
 }
 
 
-
-
-
-
-
-
+/* ============================
+   Choose User
+============================ */
 
 function chooseUser(
-type,
-user,
-customName=""
+    type,
+    user,
+    customName=""
 ){
 
+    /*
+       Other keeps the old free time
+       selection exactly as before.
+    */
+
+    if(type==="Other"){
+
+        showOtherTimeSelection(
+            type,
+            user,
+            customName
+        );
+
+        return;
+
+    }
 
 
-document.getElementById("modalBody")
-.innerHTML=`
+    if(type==="Kitchen"){
 
-<h3>
+        showKitchenTimeOptions(
+            user
+        );
 
-${user}
+        return;
 
--
-
-${type==="Other" ? customName : type}
-
-</h3>
+    }
 
 
+    if(type==="Guarding"){
 
-<label>
+        showGuardingTimeOptions(
+            user
+        );
 
-משעה:
+        return;
 
-</label>
-
-
-<input id="start" type="time">
-
-
-
-<br>
-
-
-
-<label>
-
-עד שעה:
-
-</label>
-
-
-<input id="end" type="time">
-
-
-
-<br><br>
-
-
-
-<button onclick="saveAssignment('${type}','${user}','${customName}')">
-
-שמירה
-
-</button>
-
-`;
-
-
+    }
 
 }
 
 
+/* ============================
+   Other Time Selection
+============================ */
+
+function showOtherTimeSelection(
+    type,
+    user,
+    customName=""
+){
+
+    document.getElementById("modalBody")
+        .innerHTML=`
+
+        <h3>
+
+            ${user} - ${customName}
+
+        </h3>
+
+        <label>
+
+            משעה:
+
+        </label>
+
+        <input id="start" type="time">
+
+        <br>
+
+        <label>
+
+            עד שעה:
+
+        </label>
+
+        <input id="end" type="time">
+
+        <br><br>
+
+        <button onclick="saveAssignment('${type}','${user}','${customName}')">
+
+            שמירה
+
+        </button>
+
+        `;
+
+}
 
 
+/* ============================
+   Kitchen Time Options
+============================ */
+
+function showKitchenTimeOptions(user){
+
+    document.getElementById("modalBody")
+        .innerHTML=`
+
+        <h3>
+
+            ${user} - מטבח
+
+        </h3>
+
+        <button onclick="saveKitchenPreset('${user}','07:00','14:00')">
+
+            חצי בוקר
+
+        </button>
+
+        <button onclick="saveKitchenClosing('${user}')">
+
+            חצי ערב
+
+        </button>
+
+        <button onclick="showCustomTimeSelection('Kitchen','${user}')">
+
+            התאמה אישית
+
+        </button>
+
+        `;
+
+}
 
 
+/* ============================
+   Kitchen Closing
+============================ */
+
+function saveKitchenClosing(user){
+
+    saveAssignmentDirect(
+        "Kitchen",
+        user,
+        "",
+        "14:00",
+        "CLOSING"
+    );
+
+}
 
 
+/* ============================
+   Kitchen Morning
+============================ */
+
+function saveKitchenPreset(
+    user,
+    start,
+    end
+){
+
+    saveAssignmentDirect(
+        "Kitchen",
+        user,
+        "",
+        start,
+        end
+    );
+
+}
+
+
+/* ============================
+   Guarding Time Options
+============================ */
+
+function showGuardingTimeOptions(user){
+
+    document.getElementById("modalBody")
+        .innerHTML=`
+
+        <h3>
+
+            ${user} - שמירה
+
+        </h3>
+
+        <button onclick="saveGuardingPreset('${user}','00:00','04:00')">
+
+            0:00-4:00
+
+        </button>
+
+        <button onclick="saveGuardingPreset('${user}','04:00','08:00')">
+
+            4:00-8:00
+
+        </button>
+
+        <button onclick="saveGuardingPreset('${user}','08:00','12:00')">
+
+            8:00-12:00
+
+        </button>
+
+        <button onclick="saveGuardingPreset('${user}','12:00','16:00')">
+
+            12:00-16:00
+
+        </button>
+
+        <button onclick="saveGuardingPreset('${user}','16:00','20:00')">
+
+            16:00-20:00
+
+        </button>
+
+        <button onclick="saveGuardingPreset('${user}','20:00','00:00')">
+
+            20:00-0:00
+
+        </button>
+
+        <button onclick="showCustomTimeSelection('Guarding','${user}')">
+
+            התאמה אישית
+
+        </button>
+
+        `;
+
+}
+
+
+/* ============================
+   Guarding Preset
+============================ */
+
+function saveGuardingPreset(
+    user,
+    start,
+    end
+){
+
+    saveAssignmentDirect(
+        "Guarding",
+        user,
+        "",
+        start,
+        end
+    );
+
+}
+
+
+/* ============================
+   Custom Time Selection
+============================ */
+
+function showCustomTimeSelection(
+    type,
+    user,
+    customName=""
+){
+
+    document.getElementById("modalBody")
+        .innerHTML=`
+
+        <h3>
+
+            ${user} -
+
+            ${type==="Kitchen" ? "מטבח" : "שמירה"}
+
+        </h3>
+
+        <label>
+
+            משעה:
+
+        </label>
+
+        <select id="start">
+
+            ${generateTimeOptions()}
+
+        </select>
+
+        <br>
+
+        <label>
+
+            עד שעה:
+
+        </label>
+
+        <select id="end">
+
+            ${generateTimeOptions()}
+
+        </select>
+
+        <br><br>
+
+        <button onclick="saveAssignment('${type}','${user}','${customName}')">
+
+            שמירה
+
+        </button>
+
+        `;
+
+}
+
+
+/* ============================
+   Generate 5 Minute Options
+============================ */
+
+function generateTimeOptions(){
+
+    let html="";
+
+    for(let minutes=0;minutes<24*60;minutes+=5){
+
+        let hours =
+            Math.floor(minutes/60);
+
+        let mins =
+            minutes%60;
+
+        let value =
+            String(hours).padStart(2,"0")
+            +
+            ":"
+            +
+            String(mins).padStart(2,"0");
+
+
+        html+=`
+
+            <option value="${value}">
+
+                ${value}
+
+            </option>
+
+        `;
+
+    }
+
+    return html;
+
+}
+
+
+/* ============================
+   Save Assignment
+============================ */
 
 async function saveAssignment(
-type,
-user,
-customName=""
+    type,
+    user,
+    customName=""
 ){
 
+    let body={
 
+        assignedUser:user,
 
-let body={
+        taskType:type,
 
+        customName:customName,
 
+        date:formatDate(selectedDate),
 
-assignedUser:user,
+        startTime:
+            document.getElementById("start").value,
 
+        endTime:
+            document.getElementById("end").value
 
+    };
 
-taskType:type,
 
+    let res =
+        await fetch("/api/assignments",{
 
+            method:"POST",
 
-customName:customName,
+            headers:{
 
+                "Content-Type":
+                    "application/json"
 
+            },
 
-date:formatDate(selectedDate),
+            body:
+                JSON.stringify(body)
 
+        });
 
 
-startTime:
-document.getElementById("start").value,
+    let data =
+        await res.json();
 
 
+    if(data.needConfirm){
 
-endTime:
-document.getElementById("end").value
+        showConfirm(
 
+            data.message,
 
+            ()=>{
 
-};
+                body.ignoreLimit=true;
 
+                forceSave(body);
 
+            }
 
+        );
 
+        return;
 
+    }
 
-let res =
-await fetch("/api/assignments",{
 
+    if(!res.ok){
 
-method:"POST",
+        alert(
+            data.error ||
+            "אירעה שגיאה"
+        );
 
+        return;
 
-headers:{
+    }
 
 
-"Content-Type":"application/json"
+    closeModal();
 
+    alert("נשמר בהצלחה");
 
-},
-
-
-body:
-JSON.stringify(body)
-
-
-
-});
-
-
-
-
-
-let data =
-await res.json();
-
-
-
-
-
-
-
-if(data.needConfirm){
-
-
-
-showConfirm(
-
-data.message,
-
-()=>{
-
-
-body.ignoreLimit=true;
-
-
-forceSave(body);
-
-
-}
-
-);
-
-
-
-return;
-
-
+    buildCalendar();
 
 }
 
 
+/* ============================
+   Direct Save
+============================ */
+
+async function saveAssignmentDirect(
+    type,
+    user,
+    customName,
+    startTime,
+    endTime
+){
+
+    let body={
+
+        assignedUser:user,
+
+        taskType:type,
+
+        customName:customName,
+
+        date:formatDate(selectedDate),
+
+        startTime:startTime,
+
+        endTime:endTime
+
+    };
 
 
+    let res =
+        await fetch("/api/assignments",{
+
+            method:"POST",
+
+            headers:{
+
+                "Content-Type":
+                    "application/json"
+
+            },
+
+            body:
+                JSON.stringify(body)
+
+        });
 
 
-closeModal();
+    let data =
+        await res.json();
 
 
-alert("נשמר בהצלחה");
+    if(data.needConfirm){
+
+        showConfirm(
+
+            data.message,
+
+            ()=>{
+
+                body.ignoreLimit=true;
+
+                forceSave(body);
+
+            }
+
+        );
+
+        return;
+
+    }
 
 
-buildCalendar();
+    if(!res.ok){
+
+        alert(
+            data.error ||
+            "אירעה שגיאה"
+        );
+
+        return;
+
+    }
 
 
+    closeModal();
+
+    alert("נשמר בהצלחה");
+
+    buildCalendar();
 
 }
 
 
-
-
-
-
-
-
+/* ============================
+   Force Save
+============================ */
 
 async function forceSave(body){
 
+    let res =
+        await fetch("/api/assignments",{
+
+            method:"POST",
+
+            headers:{
+
+                "Content-Type":
+                    "application/json"
+
+            },
+
+            body:
+                JSON.stringify(body)
+
+        });
 
 
-await fetch("/api/assignments",{
+    let data =
+        await res.json();
 
 
-method:"POST",
+    if(!res.ok){
+
+        alert(
+            data.error ||
+            "אירעה שגיאה"
+        );
+
+        return;
+
+    }
 
 
-headers:{
+    closeConfirm();
 
+    closeModal();
 
-"Content-Type":"application/json"
+    alert("נשמר בהצלחה");
 
-
-},
-
-
-body:
-JSON.stringify(body)
-
-
-
-});
-
-
-
-
-
-closeConfirm();
-
-
-closeModal();
-
-
-alert("נשמר בהצלחה");
-
-
-buildCalendar();
-
-
+    buildCalendar();
 
 }
 
 
-
-
-
-
-
-
-
-// ============================
-// Delete
-// ============================
+/* ============================
+   Delete
+============================ */
 
 async function deleteAssignment(id){
 
+    await fetch(
 
-await fetch(
+        `/api/assignments/${id}`,
 
-`/api/assignments/${id}`,
+        {
 
-{
+            method:"DELETE"
 
-method:"DELETE"
+        }
 
-}
-
-);
-
+    );
 
 
-closeModal();
+    closeModal();
 
-
-buildCalendar();
-
-
+    buildCalendar();
 
 }
 
 
-
-
-
-
-
-
-
-// ============================
-// Confirm Modal
-// ============================
+/* ============================
+   Confirm Modal
+============================ */
 
 function showConfirm(
-text,
-yesFunction
+    text,
+    yesFunction
 ){
 
+    pendingAssignment =
+        yesFunction;
 
 
-pendingAssignment =
-yesFunction;
+    document.getElementById("confirmText")
+        .innerHTML =
+        text;
 
 
-
-
-document.getElementById("confirmText")
-.innerHTML =
-text;
-
-
-
-
-document.getElementById("confirmModal")
-.classList.add("active");
-
-
+    document.getElementById("confirmModal")
+        .classList.add("active");
 
 }
-
-
-
-
 
 
 document.getElementById("confirmYes")
 .onclick=()=>{
 
+    if(pendingAssignment){
 
-if(pendingAssignment){
+        pendingAssignment();
 
-
-pendingAssignment();
-
-
-}
-
+    }
 
 };
 
 
-
-
-
 document.getElementById("confirmNo")
 .onclick =
-closeConfirm;
-
-
-
-
+    closeConfirm;
 
 
 function closeConfirm(){
 
+    document.getElementById("confirmModal")
+        .classList.remove("active");
 
-document.getElementById("confirmModal")
-.classList.remove("active");
-
-
-
-pendingAssignment=null;
-
+    pendingAssignment=null;
 
 }
 
 
-
-
-
-
-
-
-
-// ============================
-// Main Modal
-// ============================
+/* ============================
+   Main Modal
+============================ */
 
 function openModal(title){
 
+    document.getElementById("modalTitle")
+        .textContent =
+        title;
 
-document.getElementById("modalTitle")
-.textContent =
-title;
-
-
-
-document.getElementById("modal")
-.classList.add("active");
-
+    document.getElementById("modal")
+        .classList.add("active");
 
 }
-
-
-
-
 
 
 function closeModal(){
 
-
-document.getElementById("modal")
-.classList.remove("active");
-
+    document.getElementById("modal")
+        .classList.remove("active");
 
 }
 
 
-
-
-
 document.getElementById("close")
 .onclick =
-closeModal;
-
-
-
-
-
+    closeModal;
 
 
 document.getElementById("modal")
 .onclick=e=>{
 
+    if(e.target.id==="modal"){
 
-if(e.target.id==="modal"){
+        closeModal();
 
-
-closeModal();
-
-
-}
-
+    }
 
 };
 
 
-
-
-
-
-
-
-
-// ============================
-// Theme Switch
-// ============================
+/* ============================
+   Theme Switch
+============================ */
 
 const themeButton =
-document.getElementById("themeToggle");
-
-
-
-
-
+    document.getElementById("themeToggle");
 
 
 function loadTheme(){
 
+    let theme =
+        localStorage.getItem("theme");
 
-let theme =
-localStorage.getItem("theme");
+    if(theme==="dark"){
 
+        document.body.classList.add("dark");
 
+        themeButton.textContent="☀️";
 
-if(theme==="dark"){
-
-
-
-document.body.classList.add("dark");
-
-
-themeButton.textContent="☀️";
-
+    }
 
 }
-
-
-
-}
-
-
-
-
 
 
 themeButton.onclick=()=>{
 
+    document.body.classList.toggle("dark");
 
+    let dark =
+        document.body.classList.contains("dark");
 
-document.body.classList.toggle("dark");
+    localStorage.setItem(
 
+        "theme",
 
+        dark ? "dark" : "light"
 
-let dark =
-document.body.classList.contains("dark");
+    );
 
-
-
-localStorage.setItem(
-
-"theme",
-
-dark ? "dark" : "light"
-
-);
-
-
-
-
-themeButton.textContent =
-dark
-?
-"☀️"
-:
-"🌙";
-
-
+    themeButton.textContent =
+        dark
+        ?
+        "☀️"
+        :
+        "🌙";
 
 };
 
 
-
-
-
-
 loadTheme();
-
-
-
-
 
 </script>
 
@@ -1792,3 +1568,4 @@ loadTheme();
 </body>
 
 </html>
+
