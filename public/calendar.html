@@ -652,23 +652,30 @@ async function openEdit(date){
 
         </h3>
 
-        <button onclick="chooseType('Kitchen')">
+        <div class="choice-grid">
 
-            מטבח
+            <button class="choice-card choice-kitchen" onclick="chooseType('Kitchen')">
 
-        </button>
+                <span class="choice-icon">🍳</span>
+                <span class="choice-label">מטבח</span>
 
-        <button onclick="chooseType('Guarding')">
+            </button>
 
-            שמירה
+            <button class="choice-card choice-guard" onclick="chooseType('Guarding')">
 
-        </button>
+                <span class="choice-icon">🛡️</span>
+                <span class="choice-label">שמירה</span>
 
-        <button onclick="chooseType('Other')">
+            </button>
 
-            אחר
+            <button class="choice-card choice-other" onclick="chooseType('Other')">
 
-        </button>
+                <span class="choice-icon">📌</span>
+                <span class="choice-label">אחר</span>
+
+            </button>
+
+        </div>
 
         `;
 
@@ -692,9 +699,11 @@ async function chooseType(type){
 
             </h3>
 
-            <input id="otherName" placeholder="שם המשימה">
+            <div class="form-field">
+                <input id="otherName" placeholder="שם המשימה">
+            </div>
 
-            <button onclick="chooseOtherName()">
+            <button class="primary-btn" onclick="chooseOtherName()">
 
                 המשך
 
@@ -769,6 +778,8 @@ async function showUsers(
 
         </h3>
 
+        <div class="choice-grid user-grid">
+
     `;
 
 
@@ -776,15 +787,18 @@ async function showUsers(
 
         html+=`
 
-            <button onclick="chooseUser('${type}','${u.username}','${customName}')">
+            <button class="choice-card user-card" onclick="chooseUser('${type}','${u.username}','${customName}')">
 
-                ${u.username}
+                <span class="choice-label">${u.username}</span>
 
             </button>
 
         `;
 
     });
+
+
+    html+=`</div>`;
 
 
     document.getElementById("modalBody")
@@ -865,27 +879,21 @@ function showOtherTimeSelection(
 
         </h3>
 
-        <label>
+        <div class="time-fields">
 
-            משעה:
+            <div class="time-field">
+                <label>משעה</label>
+                <input id="start" type="time">
+            </div>
 
-        </label>
+            <div class="time-field">
+                <label>עד שעה</label>
+                <input id="end" type="time">
+            </div>
 
-        <input id="start" type="time">
+        </div>
 
-        <br>
-
-        <label>
-
-            עד שעה:
-
-        </label>
-
-        <input id="end" type="time">
-
-        <br><br>
-
-        <button onclick="saveAssignment('${type}','${user}','${customName}')">
+        <button class="primary-btn" onclick="saveAssignment('${type}','${user}','${customName}')">
 
             שמירה
 
@@ -911,21 +919,27 @@ function showKitchenTimeOptions(user){
 
         </h3>
 
-        <button onclick="saveKitchenPreset('${user}','07:00','14:00')">
+        <div class="preset-grid">
 
-            חצי בוקר
+            <button class="preset-btn" onclick="saveKitchenPreset('${user}','07:00','14:00')">
 
-        </button>
+                חצי בוקר
+                <span class="preset-time">07:00 - 14:00</span>
 
-        <button onclick="saveKitchenClosing('${user}')">
+            </button>
 
-            חצי ערב
+            <button class="preset-btn" onclick="saveKitchenClosing('${user}')">
 
-        </button>
+                חצי ערב
+                <span class="preset-time">14:00 - סגירה</span>
 
-        <button onclick="showCustomTimeSelection('Kitchen','${user}')">
+            </button>
 
-            התאמה אישית
+        </div>
+
+        <button class="custom-btn" onclick="showCustomTimeSelection('Kitchen','${user}')">
+
+            ⚙️ התאמה אישית
 
         </button>
 
@@ -987,45 +1001,49 @@ function showGuardingTimeOptions(user){
 
         </h3>
 
-        <button onclick="saveGuardingPreset('${user}','00:00','04:00')">
+        <div class="preset-grid preset-grid-2col">
 
-            0:00-4:00
+            <button class="preset-btn" onclick="saveGuardingPreset('${user}','00:00','04:00')">
 
-        </button>
+                00:00 - 04:00
 
-        <button onclick="saveGuardingPreset('${user}','04:00','08:00')">
+            </button>
 
-            4:00-8:00
+            <button class="preset-btn" onclick="saveGuardingPreset('${user}','04:00','08:00')">
 
-        </button>
+                04:00 - 08:00
 
-        <button onclick="saveGuardingPreset('${user}','08:00','12:00')">
+            </button>
 
-            8:00-12:00
+            <button class="preset-btn" onclick="saveGuardingPreset('${user}','08:00','12:00')">
 
-        </button>
+                08:00 - 12:00
 
-        <button onclick="saveGuardingPreset('${user}','12:00','16:00')">
+            </button>
 
-            12:00-16:00
+            <button class="preset-btn" onclick="saveGuardingPreset('${user}','12:00','16:00')">
 
-        </button>
+                12:00 - 16:00
 
-        <button onclick="saveGuardingPreset('${user}','16:00','20:00')">
+            </button>
 
-            16:00-20:00
+            <button class="preset-btn" onclick="saveGuardingPreset('${user}','16:00','20:00')">
 
-        </button>
+                16:00 - 20:00
 
-        <button onclick="saveGuardingPreset('${user}','20:00','00:00')">
+            </button>
 
-            20:00-0:00
+            <button class="preset-btn" onclick="saveGuardingPreset('${user}','20:00','00:00')">
 
-        </button>
+                20:00 - 00:00
 
-        <button onclick="showCustomTimeSelection('Guarding','${user}')">
+            </button>
 
-            התאמה אישית
+        </div>
+
+        <button class="custom-btn" onclick="showCustomTimeSelection('Guarding','${user}')">
+
+            ⚙️ התאמה אישית
 
         </button>
 
@@ -1076,35 +1094,29 @@ function showCustomTimeSelection(
 
         </h3>
 
-        <label>
+        <div class="time-fields">
 
-            משעה:
+            <div class="time-field">
+                <label>משעה</label>
+                <select id="start" class="time-select">
 
-        </label>
+                    ${generateTimeOptions()}
 
-        <select id="start">
+                </select>
+            </div>
 
-            ${generateTimeOptions()}
+            <div class="time-field">
+                <label>עד שעה</label>
+                <select id="end" class="time-select">
 
-        </select>
+                    ${generateTimeOptions()}
 
-        <br>
+                </select>
+            </div>
 
-        <label>
+        </div>
 
-            עד שעה:
-
-        </label>
-
-        <select id="end">
-
-            ${generateTimeOptions()}
-
-        </select>
-
-        <br><br>
-
-        <button onclick="saveAssignment('${type}','${user}','${customName}')">
+        <button class="primary-btn" onclick="saveAssignment('${type}','${user}','${customName}')">
 
             שמירה
 
@@ -1568,4 +1580,3 @@ loadTheme();
 </body>
 
 </html>
-

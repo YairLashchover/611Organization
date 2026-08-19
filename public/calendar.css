@@ -1069,11 +1069,369 @@ body.dark .day.past{
     margin:8px 0;
 
 
-    border:1px solid:#ccc;
+    border:1px solid #ccc;
 
 
     border-radius:5px;
 
+
+}
+
+
+
+.form-field{
+
+    margin:10px 0;
+
+}
+
+
+
+#modalBody button.primary-btn{
+
+    margin-top:14px;
+
+}
+
+
+
+
+
+/* ============================
+   TASK / USER CHOICE CARDS
+============================ */
+
+
+.choice-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(90px,1fr));
+
+    gap:12px;
+
+    margin:14px 0 6px;
+
+}
+
+
+
+
+
+#modalBody button.choice-card{
+
+    width:auto;
+
+    margin:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:6px;
+
+    padding:16px 10px;
+
+    background:#f2f5fa;
+
+    color:#222;
+
+    border:2px solid transparent;
+
+    border-radius:10px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    transition:.2s;
+
+}
+
+
+
+
+
+#modalBody button.choice-card:hover{
+
+    background:#e6f0ff;
+
+    border-color:#007BFF;
+
+    transform:translateY(-3px);
+
+}
+
+
+
+
+
+.choice-icon{
+
+    font-size:26px;
+
+    line-height:1;
+
+}
+
+
+
+
+
+.choice-label{
+
+    font-size:14px;
+
+}
+
+
+
+
+
+.user-grid{
+
+    grid-template-columns:1fr;
+
+    gap:8px;
+
+}
+
+
+
+
+
+#modalBody button.user-card{
+
+    flex-direction:row;
+
+    justify-content:flex-start;
+
+    padding:13px 16px;
+
+    font-size:15px;
+
+}
+
+
+
+
+
+#modalBody button.user-card::before{
+
+    content:"👤";
+
+    font-size:16px;
+
+}
+
+
+
+
+
+
+
+
+
+/* ============================
+   TIME PRESET BUTTONS
+============================ */
+
+
+.preset-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:10px;
+
+    margin:14px 0 6px;
+
+}
+
+
+
+
+
+#modalBody button.preset-btn{
+
+    width:auto;
+
+    margin:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    gap:4px;
+
+    padding:12px 8px;
+
+    background:#f2f5fa;
+
+    color:#222;
+
+    border:2px solid transparent;
+
+    border-radius:8px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    transition:.2s;
+
+}
+
+
+
+
+
+#modalBody button.preset-btn:hover{
+
+    background:#e6f0ff;
+
+    border-color:#007BFF;
+
+    transform:translateY(-3px);
+
+}
+
+
+
+
+
+.preset-time{
+
+    font-size:12px;
+
+    font-weight:400;
+
+    color:#777;
+
+}
+
+
+
+
+
+#modalBody button.custom-btn{
+
+    width:100%;
+
+    margin:4px 0 0;
+
+    padding:11px;
+
+    background:transparent;
+
+    color:#007BFF;
+
+    border:2px dashed #a9c9fb;
+
+    border-radius:8px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    transition:.2s;
+
+}
+
+
+
+
+
+#modalBody button.custom-btn:hover{
+
+    background:#eef5ff;
+
+    border-color:#007BFF;
+
+}
+
+
+
+
+
+
+
+
+
+/* ============================
+   TIME FIELDS (aligned)
+============================ */
+
+
+.time-fields{
+
+    display:flex;
+
+    gap:12px;
+
+    margin:16px 0 4px;
+
+}
+
+
+
+
+
+.time-field{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+
+}
+
+
+
+
+
+.time-field label{
+
+    font-size:13px;
+
+    font-weight:600;
+
+    color:#555;
+
+}
+
+
+
+
+
+.time-field input,
+.time-field select{
+
+    margin:0;
+
+    width:100%;
+
+    padding:10px;
+
+    border:1px solid #ccc;
+
+    border-radius:6px;
+
+    font-size:15px;
+
+    background:white;
+
+    cursor:pointer;
 
 }
 
@@ -1371,6 +1729,113 @@ body.dark #themeToggle{
 
 
 
+body.dark #modalBody button.choice-card,
+body.dark #modalBody button.preset-btn,
+body.dark #modalBody button.user-card{
+
+
+    background:#333;
+
+
+    color:white;
+
+
+}
+
+
+
+
+
+body.dark #modalBody button.choice-card:hover,
+body.dark #modalBody button.preset-btn:hover,
+body.dark #modalBody button.user-card:hover{
+
+
+    background:#3a3f55;
+
+
+    border-color:#4dabf7;
+
+
+}
+
+
+
+
+
+body.dark .preset-time{
+
+
+    color:#aaa;
+
+
+}
+
+
+
+
+
+body.dark #modalBody button.custom-btn{
+
+
+    color:#4dabf7;
+
+
+    border-color:#4a5b73;
+
+
+}
+
+
+
+
+
+body.dark #modalBody button.custom-btn:hover{
+
+
+    background:#2a2f3a;
+
+
+    border-color:#4dabf7;
+
+
+}
+
+
+
+
+
+body.dark .time-field label{
+
+
+    color:#ccc;
+
+
+}
+
+
+
+
+
+body.dark .time-field input,
+body.dark .time-field select{
+
+
+    background:#333;
+
+
+    color:white;
+
+
+    border-color:#555;
+
+
+}
+
+
+
+
+
 
 
 
@@ -1476,6 +1941,29 @@ body.dark #themeToggle{
 
 
         font-size:14px;
+
+
+    }
+
+
+
+
+    .time-fields{
+
+
+        flex-direction:column;
+
+
+    }
+
+
+
+
+
+    .choice-grid{
+
+
+        grid-template-columns:repeat(2,1fr);
 
 
     }
